@@ -4,13 +4,240 @@ info:
   available right here."
   version: "0.5"
   title: "International Project 06"
+tags:
+  - name: "User"
+    description: "Everything that has to do with users"
+  - name: "Game"
+    description: "API calls that have to do with games"
+paths:
+  /user:
+    get:
+      tags:
+        - "User"
+      responses:
+        '200':
+          description: "Retrieved user info."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchedUser"
+  /users/register:
+    post:
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                description:
+                  type: string
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: "OK, registered user"
+  /users/{id}/registered:
+    get:
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Boolean to show if the user is registered or not"     
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /users/login:
+    post:
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: "OK, logged in user."
+        '400':
+          description: "Bad request"
+        '404':
+          description: "You are not registered yet"
+  /users/logout:
+    post:
+      tags:
+        - "User"
+      responses:
+        '200':
+          description: "Log out from your account."
+        '400':
+          description: "There is no logged-in user."
+  /users/matchSuggestion:
+    get:
+      tags:
+        - "User"
+      parameters:
+        - in: query
+          name: games
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: "Retrieved user info."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/matchSuggestion/{id}:
+    patch:
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accept:
+                  type: boolean
+      responses:
+        '200':
+          description: "OK"
+  /users/matches:
+    get:
+      tags:
+        - "User"
+      responses:
+        '200':
+          description: "Retrieved a list of all the user's matches."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  avatar_path:
+                    type: string
+  /users/matches/{user_id}:
+    get:
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: "Retrieve the data of one of your matches."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchedUser"
+        '404':
+          description: "Match not found."
+  /users/game:
+    post:
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                game_id:
+                  type: integer
+                hours_played:
+                  type: integer
+                rank:
+                  type: string
+      responses:
+        '200':
+          description: "OK, added game to the user"
+  /users/blacklist/{game_id}:
+    post:
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: game_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: "OK, added game to the user's blacklist"
+        '400':
+          description: "This game is already in the user's blacklist"
+    delete:
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: game_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: "OK, deleted game from the user's blacklist"  
+        '404':
+          description: 'Game not found in blacklist'
+  /games:
+    get:
+      tags: 
+        - "Game"
+      responses:
+        '200':
+          description: "OK, returns a list of all the games"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
 components:
   schemas:
     User:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         avatar_path:
           type: string
         description:
