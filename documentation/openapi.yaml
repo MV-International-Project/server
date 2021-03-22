@@ -1,0 +1,57 @@
+openapi: "3.0.0"
+info:
+  description: "This is the API spec for the International Project 06 application. You can find all the API calls that are
+  available right here."
+  version: "0.5"
+  title: "International Project 06"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        avatar_path:
+          type: string
+        description:
+          type: string
+        games:
+          type: array
+          items:
+            $ref:  "#/components/schemas/UserGame"
+    MatchedUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            discord_tag:
+              type: string
+            steam_name:
+              type: string
+    Game:
+      type: object
+      properties:
+        game_id:
+          type: integer
+        name:
+          type: string
+        genre:
+          type: array
+          items:
+            type: string
+        image_path:
+          type: string
+    UserGame:
+      allOf:
+        - $ref: "#/components/schemas/Game"
+        - type: object
+          properties:
+            hours_played:
+              type: integer
+            rank:
+              type: string
+            blacklist:
+              type: boolean
+    
+        
+        
