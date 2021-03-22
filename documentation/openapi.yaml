@@ -35,13 +35,13 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
+                  $ref: "#/components/schemas/username"
                 description:
-                  type: string
+                  $ref: "#/components/schemas/description"
                 access_token:
-                  type: string
+                  $ref: "#/components/schemas/access_token"
                 refresh_token:
-                  type: string
+                  $ref: "#/components/schemas/refresh_token"
       responses:
         '200':
           description: "OK, registered user."
@@ -57,7 +57,7 @@ paths:
           name: id
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/user_id"
       responses:
         '200':
           description: "Boolean to show if the user is registered or not."     
@@ -78,9 +78,9 @@ paths:
               type: object
               properties:
                 access_token:
-                  type: string
+                  $ref: "#/components/schemas/access_token"
                 refresh_token:
-                  type: string
+                  $ref: "#/components/schemas/refresh_token"
       responses:
         '200':
           description: "OK, logged in user."
@@ -128,7 +128,7 @@ paths:
           name: id
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/user_id"
       requestBody:
         required: true
         content:
@@ -155,9 +155,9 @@ paths:
                 type: object
                 properties:
                   id:
-                    type: string
+                    $ref: "#/components/schemas/user_id"
                   username:
-                    type: string
+                    $ref: "#/components/schemas/username"
                   avatar_path:
                     type: string
   /users/matches/{user_id}:
@@ -169,7 +169,7 @@ paths:
         - in: path
           name: user_id
           schema:
-            type: integer
+            $ref: "#/components/schemas/user_id"
           required: true
       responses:
         '200':
@@ -248,15 +248,32 @@ paths:
                   $ref: "#/components/schemas/Game"
 components:
   schemas:
+    access_token:
+      type: string
+      example: "k04TitS5bT5AUbv3vgpdcyIHANIkPu"
+    refresh_token:
+      type: string
+      example: "wOCLJLdkQcxeSmR71TqxlZjWHk6EWO"
+    user_id:
+      type: string
+      example: "379658587221524492"
+    username:
+      type: string
+      example: "Ritchwood"
+    description:
+      type: string
+      example: "Looking for some gamers to play Valorant with!"
     User:
       type: object
       properties:
         id:
-          type: string
+          $ref: "#/components/schemas/user_id"
+        username:
+          $ref: "#/components/schemas/username"
         avatar_path:
           type: string
         description:
-          type: string
+          $ref: "#/components/schemas/description"
         games:
           type: array
           items:
@@ -294,6 +311,3 @@ components:
               type: string
             blacklist:
               type: boolean
-    
-        
-        
