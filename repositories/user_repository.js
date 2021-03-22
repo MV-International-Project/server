@@ -40,7 +40,6 @@ function getUserFromId(user_id, cb) {
             cb(error);
         }
         else {
-            console.log(user_id === "123456789");
             console.log("Connected to DB");
             let sql = "SELECT * from users where user_id = ?";
             connection.query(sql, [user_id], (err, data) => {
