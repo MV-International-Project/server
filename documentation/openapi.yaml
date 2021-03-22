@@ -12,6 +12,7 @@ tags:
 paths:
   /user:
     get:
+      description: "Retrieve the currently logged in user's information."
       tags:
         - "User"
       responses:
@@ -23,6 +24,7 @@ paths:
                 $ref: "#/components/schemas/MatchedUser"
   /users/register:
     post:
+      description: "Register an account."
       tags:
         - "User"
       requestBody:
@@ -33,18 +35,21 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
+                  $ref: "#/components/schemas/username"
                 description:
-                  type: string
+                  $ref: "#/components/schemas/description"
                 access_token:
-                  type: string
+                  $ref: "#/components/schemas/access_token"
                 refresh_token:
-                  type: string
+                  $ref: "#/components/schemas/refresh_token"
       responses:
         '200':
-          description: "OK, registered user"
+          description: "OK, registered user."
+        '400':
+          description: "Bad request"
   /users/{id}/registered:
     get:
+      description: "API call to check if a certain ID is registered or not"
       tags:
         - "User"
       parameters:
@@ -52,16 +57,17 @@ paths:
           name: id
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/user_id"
       responses:
         '200':
-          description: "Boolean to show if the user is registered or not"     
+          description: "Boolean to show if the user is registered or not."     
           content:
             application/json:
               schema:
                 type: boolean
   /users/login:
     post:
+      description: "API call to login."
       tags:
         - "User"
       requestBody:
@@ -72,18 +78,19 @@ paths:
               type: object
               properties:
                 access_token:
-                  type: string
+                  $ref: "#/components/schemas/access_token"
                 refresh_token:
-                  type: string
+                  $ref: "#/components/schemas/refresh_token"
       responses:
         '200':
           description: "OK, logged in user."
         '400':
           description: "Bad request"
         '404':
-          description: "You are not registered yet"
+          description: "You are not registered yet."
   /users/logout:
     post:
+      description: "API call to log out."
       tags:
         - "User"
       responses:
@@ -93,6 +100,7 @@ paths:
           description: "There is no logged-in user."
   /users/matchSuggestion:
     get:
+      description: "Retrieve a possible match to swipe."
       tags:
         - "User"
       parameters:
@@ -112,6 +120,7 @@ paths:
                 $ref: "#/components/schemas/User"
   /users/matchSuggestion/{id}:
     patch:
+      description: "API call to indicate whether you accept or reject a user."
       tags:
         - "User"
       parameters:
@@ -119,7 +128,7 @@ paths:
           name: id
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/user_id"
       requestBody:
         required: true
         content:
@@ -134,6 +143,7 @@ paths:
           description: "OK"
   /users/matches:
     get:
+      description: "Retrieve the names and profile pictures of all your users."
       tags:
         - "User"
       responses:
@@ -145,20 +155,21 @@ paths:
                 type: object
                 properties:
                   id:
-                    type: string
+                    $ref: "#/components/schemas/user_id"
                   username:
-                    type: string
+                    $ref: "#/components/schemas/username"
                   avatar_path:
                     type: string
   /users/matches/{user_id}:
     get:
+      description: "Retrieve all information about one of your matches."
       tags:
         - "User"
       parameters:
         - in: path
           name: user_id
           schema:
-            type: integer
+            $ref: "#/components/schemas/user_id"
           required: true
       responses:
         '200':
@@ -171,6 +182,7 @@ paths:
           description: "Match not found."
   /users/game:
     post:
+      description: "Add a game to the user's games."
       tags:
         - "User"
       requestBody:
@@ -191,6 +203,7 @@ paths:
           description: "OK, added game to the user"
   /users/blacklist/{game_id}:
     post:
+      description: "Add a game to the user's blacklist."
       tags:
         - "User"
       parameters:
@@ -205,6 +218,7 @@ paths:
         '400':
           description: "This game is already in the user's blacklist"
     delete:
+      description: "Remove a game from the user's blacklist."
       tags:
         - "User"
       parameters:
@@ -220,6 +234,7 @@ paths:
           description: 'Game not found in blacklist'
   /games:
     get:
+      description: "Retrieve all games with their information."
       tags: 
         - "Game"
       responses:
@@ -233,15 +248,32 @@ paths:
                   $ref: "#/components/schemas/Game"
 components:
   schemas:
+    access_token:
+      type: string
+      example: "k04TitS5bT5AUbv3vgpdcyIHANIkPu"
+    refresh_token:
+      type: string
+      example: "wOCLJLdkQcxeSmR71TqxlZjWHk6EWO"
+    user_id:
+      type: string
+      example: "379658587221524492"
+    username:
+      type: string
+      example: "Ritchwood"
+    description:
+      type: string
+      example: "Looking for some gamers to play Valorant with!"
     User:
       type: object
       properties:
         id:
-          type: string
+          $ref: "#/components/schemas/user_id"
+        username:
+          $ref: "#/components/schemas/username"
         avatar_path:
           type: string
         description:
-          type: string
+          $ref: "#/components/schemas/description"
         games:
           type: array
           items:
@@ -279,6 +311,3 @@ components:
               type: string
             blacklist:
               type: boolean
-    
-        
-        
