@@ -4,10 +4,11 @@ const config = require("../config");
 function dataToUser(data) {
     const user = {
         user_id: data.user_id,
-        username: data.user_id,
+        username: data.username,
         description: data.description,
         last_login: data.last_login
-    }
+    };
+    return user;
 }
 
 function addUser(user_id ,username, description, last_login ,cb) {
@@ -39,6 +40,7 @@ function getUserFromId(user_id, cb) {
             cb(error);
         }
         else {
+            console.log(user_id === "123456789");
             console.log("Connected to DB");
             let sql = "SELECT * from users where user_id = ?";
             connection.query(sql, [user_id], (err, data) => {
