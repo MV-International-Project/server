@@ -71,21 +71,28 @@ router.get("/user", authenticateJWT, (req, res, next) => {
     }).catch(next);
 });
 
-router.post("/users/game", (req, res, next) => {
+router.post("/users/games/:id", authenticateJWT, (req, res, next) => {
     let body = req.body;
-    let user_id = body.user_id;
-    let game_id = body.game_id;
+    let user_id = req.user_id;
+    let game_id = req.params.game_id;
     let hours_played = body.hours_played;
     let rank = body.rank;
-    userController.connectGameToUser(user_id, game_id, hours_played, rank)
+    userGamesController.connectGameToUser(user_id, game_id, hours_played, rank)
         .then(result => res.status(200).json(result))
         .catch(next);
 });
 
-router.patch("/users/description", (req, res, next) => {
+router.delete("/users/games/:id", authenticateJWT, (req, res, next) => {
+    let userId = req.user_id;
+    let gameId = req.params.game_id;
+    userGamesController.removeGameFromUser(userId, gameId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
+router.patch("/users/description", authenticateJWT, (req, res, next) => {
     let body = req.body;
-    //TODO: Get the uid with authentication instead of trough the body.
-    let uid = body.user_id;
+    let uid = req.user_id;
     let description = body.description;
     userController.changeDescription(uid, description)
         .then(result => res.status(200).json(result))

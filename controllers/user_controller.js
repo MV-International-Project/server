@@ -94,16 +94,6 @@ async function changeDescription(uid, description){
     return await userRepository.changeDescription(uid, description);
 }
 
-async function connectGameToUser(uid, gid, hoursPlayed, rank){
-    if(uid == null || gid == null){
-        throw new AppError(400, "Bad request");
-    }
-    if(hoursPlayed == null){
-        hoursPlayed = 0;
-    }
-    return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
-}
-
 function getDiscordTag(discordUser) {
     return `${discordUser.username}#${discordUser.discriminator}`;
 }
@@ -126,7 +116,6 @@ function mapUserObject(user, discordUser) {
 module.exports = {
     handleLogin,
     getUserInformation,
-    connectGameToUser,
     changeDescription
 };
 
