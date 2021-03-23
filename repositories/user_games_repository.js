@@ -31,66 +31,70 @@ function userIdToUser(data) {
     });
 }
 
-function connectGameToUser(user_id, game_id, hours_played, rank, cb) {
-    let connection = mysql.createConnection(config.db);
-    connection.connect((err) => {
-        if (err) {
-            cb(err);
-        } else {
-            console.log("Connected to DB");
-            let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
-            connection.query(sql, [user_id, game_id, hours_played, rank], (error) => {
-
-                connection.end();
-                if (error) {
-                    cb(error);
-                    console.log(error);
-                } else {
-                    cb(error);
-                }
-            })
-        }
+function connectGameToUser(uid, gid, hoursPlayed, rank) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to DB");
+                let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
+                connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
+                    connection.end();
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve();
+                    }
+                })
+            }
+        });
     });
 }
 
-function getAllGamesFromUser(user_id, cb) {
-    let connection = mysql.createConnection(config.db);
-    connection.connect((err) => {
-        if (err) {
-            cb(err);
-        } else {
-            console.log("Connected to DB");
-            let sql = "SELECT game_id from user_games where user_id = ?";
-            connection.query(sql, [user_id], (error, data) => {
-                connection.end();
-                if (error) {
-                    cb(error);
-                    console.log(error);
-                } else {
-                    cb(error, data.map(dataToGames));
-                }
-            });
-        }
+function getAllGamesFromUser(uid) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to DB");
+                let sql = "SELECT game_id from user_games where user_id = ?";
+                connection.query(sql, [uid], (error, data) => {
+                    connection.end();
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(error, data.map(dataToGames));
+                    }
+                });
+            }
+        });
     });
+
 }
 
-function getAllUsersFromGame(game_id, cb) {
-    let connection = mysql.createConnection(config.db);
-    connection.connect((err) => {
-        if (err) {
-            cb(err);
-        } else {
-            console.log("Connected to DB");
-            let sql = "SELECT user_id from user_games where game_id = ?";
-            connection.query(sql, [game_id], (error, data) => {
-                connection.end();
-                if (error) {
-                    cb(error);
-                } else {
-                    cb(error, data.map(userIdToUser));
-                }
-            });
-        }
+function getAllUsersFromGame(gid) {
+    return new Promise((resolve, reject) =>{
+        let connection = mysql.createConnection(config.db);
+        connection.connect((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to DB");
+                let sql = "SELECT user_id from user_games where game_id = ?";
+                connection.query(sql, [gid], (error, data) => {
+                    connection.end();
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(error, data.map(userIdToUser));
+                    }
+                });
+            }
+        });
     });
 }
 
