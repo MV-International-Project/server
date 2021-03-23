@@ -29,6 +29,17 @@ CREATE TABLE `discord` (
   CONSTRAINT `discord_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+/*Table structure for table `games` */
+
+DROP TABLE IF EXISTS `games`;
+
+CREATE TABLE `games` (
+  `game_id` int NOT NULL,
+  `name` varchar(70) NOT NULL,
+  `image_link` varchar(50) NOT NULL,
+  PRIMARY KEY (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 /*Table structure for table `matches` */
 
 DROP TABLE IF EXISTS `matches`;
@@ -68,6 +79,8 @@ CREATE TABLE `user_games` (
   `rank` varchar(20) DEFAULT NULL,
   `blacklist` bit(1) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`game_id`),
+  KEY `fk_games_userGamer` (`game_id`),
+  CONSTRAINT `fk_games_userGamer` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`),
   CONSTRAINT `fk_user_userGames` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
