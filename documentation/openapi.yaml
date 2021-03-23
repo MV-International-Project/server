@@ -232,17 +232,11 @@ paths:
           description: "OK, deleted game from the user's blacklist"
         '404':
           description: 'Game not found in blacklist'
-  /users/description/{user_id}:
+  /users/description:
     post:
       description: "Modify the user's profile description."
       tags:
         - "User"
-      parameters:
-        - in: path
-          name: user_id
-          schema:
-            type: integer
-          required: true
       requestBody:
         required: true
         content:
