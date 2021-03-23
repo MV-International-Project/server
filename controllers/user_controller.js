@@ -3,6 +3,7 @@
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
+const userGamesRepository = require("../repositories/user_games_repository");
 
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
@@ -26,4 +27,14 @@ async function registerUser(username, description, accessToken, refreshToken) {
     return await userRepository.addUser(uid, username, description);
 }
 
-module.exports = {registerUser};
+async function connectGameToUser(uid, gid, hoursPlayed, rank){
+    if(uid == null || gid == null){
+        throw new AppError(400, "Bad request");
+    }
+    if(hoursPlayed == null){
+        hoursPlayed = 0;
+    }
+    return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
+}
+
+module.exports = {registerUser, connectGameToUser};

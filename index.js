@@ -4,7 +4,6 @@ const config = require('./config');
 
 const { AppError } = require('./errors');
 const userController = require("./controllers/user_controller");
-const user_games_repo = require("./repositories/user_games_repository");
 
 const http = require("http");
 const express = require("express");
@@ -44,21 +43,15 @@ router.post("/users/register", (req, res, next) => {
     .catch(next);
 });
 
-router.post("/users/game", (req, res) => {
+router.post("/users/game", (req, res, next) => {
     let body = req.body;
     let user_id = body.user_id;
     let game_id = body.game_id;
     let hours_played = body.hours_played;
     let rank = body.rank;
-    user_games_repo.connectGameToUser(user_id, game_id, hours_played, rank, (err) => {
-        if (err) {
-            errorHandler(err);
-            res.end("failed");
-        } else {
-            res.end("succeeded");
-        }
-    });
-
+    userController.connectGameToUser(user_id, game_id, hours_played, rank)
+        .then(result => res.status(200).json(result))
+        .catch(next);
 });
 
 router.post("/test", (req, res) => {
