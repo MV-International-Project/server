@@ -8,6 +8,19 @@ const userRepository = require("../repositories/user_repository");
 const userGamesRepository = require("../repositories/user_games_repository");
 const jwt = require('jsonwebtoken');
 
+async function handleLogin(accessToken, refreshToken) {
+    // Get user ID and user using the access token
+    let user = await discordRepository.getUser(accessToken);
+    let uid = user.id;
+
+    // Check if the user already exists in our database or not
+    if(await userRepository.getUserFromId(uid) == null) {
+        return await registerUser(user.username, "", accessToken, refreshToken);
+    } else {
+        return await loginUser(accessToken, refreshToken);
+    }
+}
+
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
         throw new AppError(400, "Bad request");
@@ -45,11 +58,6 @@ async function loginUser(accessToken, refreshToken) {
 
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
-    
-    // Make sure the user exists
-    if(await userRepository.getUserFromId(uid) == null) {
-        throw new AppError(404, "User not found.");
-    }
 
     let discordName = `${user.username}#${user.discriminator}`;
 
@@ -88,8 +96,7 @@ async function connectGameToUser(uid, gid, hoursPlayed, rank){
 }
 
 module.exports = {
-    registerUser,
-    loginUser,
+    handleLogin,
     connectGameToUser,
     changeDescription
 };
