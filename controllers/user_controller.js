@@ -24,7 +24,7 @@ async function registerUser(username, description, accessToken, refreshToken) {
     }
 
     // Register user in userRepository
-    return await userRepository.addUser(uid, username, description);
+    return await userRepository.addUser(uid, username, description, accessToken, refreshToken);
 }
 
 async function loginUser(accessToken, refreshToken) {
