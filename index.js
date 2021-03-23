@@ -44,6 +44,16 @@ router.post("/users/register", (req, res, next) => {
     .catch(next);
 });
 
+router.post("/users/login", (req, res, next) => {
+    let body = req.body;
+    let accessToken = body.access_token;
+    let refreshToken = body.refresh_token;
+
+    userController.loginUser(accessToken, refreshToken)
+    .then(result => res.status(200).json(result))
+    .catch(next);
+});
+
 router.post("/users/game", (req, res, next) => {
     let body = req.body;
     let user_id = body.user_id;
