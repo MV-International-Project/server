@@ -54,24 +54,12 @@ const authenticateJWT = (req, res, next) => {
 const router = express.Router();
 app.use('/api', router);
 
-router.post("/users/register", (req, res, next) => {
-    let body = req.body;
-    let username = body.username;
-    let description = body.description;
-    let accessToken = body.access_token;
-    let refreshToken = body.refresh_token;
-
-    userController.registerUser(username, description, accessToken, refreshToken)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-});
-
 router.post("/users/login", (req, res, next) => {
     let body = req.body;
     let accessToken = body.access_token;
     let refreshToken = body.refresh_token;
 
-    userController.loginUser(accessToken, refreshToken)
+    userController.handleLogin(accessToken, refreshToken)
         .then(result => res.status(200).json(result))
         .catch(next);
 });

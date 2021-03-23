@@ -22,31 +22,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
-  /users/register:
-    post:
-      description: "Register an account."
-      tags:
-        - "User"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  $ref: "#/components/schemas/username"
-                description:
-                  $ref: "#/components/schemas/description"
-                access_token:
-                  $ref: "#/components/schemas/access_token"
-                refresh_token:
-                  $ref: "#/components/schemas/refresh_token"
-      responses:
-        '200':
-          description: "OK, registered user."
-        '400':
-          description: "Bad request"
   /users/{id}/registered:
     get:
       description: "API call to check if a certain ID is registered or not"
