@@ -5,7 +5,11 @@ const config = require('../config');
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
+=======
+const userGamesRepository = require("../repositories/user_games_repository");
+>>>>>>> c261acef8e6af8882bf57defa4e83bdf2bc4dbdf
 
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
@@ -61,7 +65,35 @@ async function loginUser(accessToken, refreshToken) {
     return {token: userToken};
 }
 
+async function changeDescription(uid, description){
+    if(uid == null || description == null){
+        throw new AppError(400, "Bad Request");
+    }
+    if(description.length > 100){
+        throw new AppError(400, "This description is too long.");
+    }
+
+    if(await userRepository.getUserFromId(uid) == null){
+        throw new AppError(404, "User not found");
+    }
+
+    return await userRepository.changeDescription(uid, description);
+}
+
+async function connectGameToUser(uid, gid, hoursPlayed, rank){
+    if(uid == null || gid == null){
+        throw new AppError(400, "Bad request");
+    }
+    if(hoursPlayed == null){
+        hoursPlayed = 0;
+    }
+    return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
+}
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    connectGameToUser,
+    changeDescription
 };
+

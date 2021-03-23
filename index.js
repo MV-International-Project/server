@@ -2,11 +2,9 @@
 
 const config = require('./config');
 
-const { AppError } = require('./errors');
+const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");
-const user_games_repo = require("./repositories/user_games_repository");
-const userRepo = require("./repositories/user_repository");
-
+const userGamesController = require("./controllers/user_games_controller");
 
 const http = require("http");
 const express = require("express");
@@ -20,12 +18,12 @@ app.use(express.json());
     Error handler
 */
 function errorHandler(err, req, res, next) {
-    if(err instanceof AppError) {
+    if (err instanceof AppError) {
         res.status(err.statusCode)
-        .json({error: err.message});
+            .json({error: err.message});
     } else {
         res.status(500)
-        .json({error: err});
+            .json({error: err});
     }
 }
 
@@ -64,8 +62,8 @@ router.post("/users/register", (req, res, next) => {
     let refreshToken = body.refresh_token;
 
     userController.registerUser(username, description, accessToken, refreshToken)
-    .then(result => res.status(200).json(result))
-    .catch(next);
+        .then(result => res.status(200).json(result))
+        .catch(next);
 });
 
 router.post("/users/login", (req, res, next) => {
@@ -74,24 +72,29 @@ router.post("/users/login", (req, res, next) => {
     let refreshToken = body.refresh_token;
 
     userController.loginUser(accessToken, refreshToken)
-    .then(result => res.status(200).json(result))
-    .catch(next);
-})
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
 
-router.post("/users/game", (req, res) => {
+router.post("/users/game", (req, res, next) => {
     let body = req.body;
     let user_id = body.user_id;
     let game_id = body.game_id;
     let hours_played = body.hours_played;
     let rank = body.rank;
-    user_games_repo.connectGameToUser(user_id, game_id, hours_played, rank, (err) => {
-        if (err) {
-            errorHandler(err);
-            res.end("failed");
-        } else {
-            res.end("succeeded");
-        }
-    });
+    userController.connectGameToUser(user_id, game_id, hours_played, rank)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
+router.patch("/users/description", (req, res, next) => {
+    let body = req.body;
+    //TODO: Get the uid with authentication instead of trough the body.
+    let uid = body.user_id;
+    let description = body.description;
+    userController.changeDescription(uid, description)
+        .then(result => res.status(200).json(result))
+        .catch(next);
 });
 
 router.post("/users/blacklist/:game_id", (req, res, next) => {
@@ -100,18 +103,29 @@ router.post("/users/blacklist/:game_id", (req, res, next) => {
     // TEMP user id
     let userId = 1;
 
-    userRepo.addGameToBlackList(userId, gameId)
-    .then(result => res.status(200).json(result))
-    .catch(next);
-        
+    userGamesController.addGameToBlackList(userId, gameId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+
 });
 
+router.delete("/users/blacklist/:game_id", (req, res, next) => {
+    let params = req.params;
+    let gameId = params.game_id;
+    // TEMP user id
+    let userId = 1;
+
+    userGamesController.removeGameFromBlackList(userId, gameId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+
+});
 
 
 router.post("/test", (req, res) => {
     discordRepository.getUser()
-    .then(user => res.status(200).json(user))
-    .catch(err => console.log(err));
+        .then(user => res.status(200).json(user))
+        .catch(err => console.log(err));
 
 });
 
