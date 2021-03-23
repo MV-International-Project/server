@@ -125,5 +125,6 @@ function removeGameFromBlackList(userId, gameId) {
 module.exports={
     addUser,
     getUserFromId,
-    addGameToBlackList
+    addGameToBlackList,
+    removeGameFromBlackList
 };
