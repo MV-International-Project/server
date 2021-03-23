@@ -9,17 +9,17 @@ function dataToGames(data) {
         name: "Testgame",
         image_link: "Fakelink"
     };
+    return game;
     // getGameByID(); TODO: Wait for games API to be integrated to get the game info from that API.
 
 }
 
 function userIdToUser(data) {
-    user_repo.getUserFromId(data.user_id, (err, user) =>{
-        if(err){
+    user_repo.getUserFromId(data.user_id, (err, user) => {
+        if (err) {
             console.log(err);
             return null;
-        }
-        else {
+        } else {
             const user = {
                 user_id: data.user_id,
                 username: data.username,
@@ -31,24 +31,22 @@ function userIdToUser(data) {
     });
 }
 
-function connectGameToUser(user_id, game_id, hours_played, rank, cb){
+function connectGameToUser(user_id, game_id, hours_played, rank, cb) {
     let connection = mysql.createConnection(config.db);
     connection.connect((err) => {
-        if(err){
+        if (err) {
             cb(err);
-        }
-        else {
+        } else {
             console.log("Connected to DB");
             let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
             connection.query(sql, [user_id, game_id, hours_played, rank], (error) => {
 
                 connection.end();
-                if(error){
+                if (error) {
                     cb(error);
                     console.log(error);
-                }
-                else {
-                    cb(error, true);
+                } else {
+                    cb(error);
                 }
             })
         }
@@ -57,20 +55,18 @@ function connectGameToUser(user_id, game_id, hours_played, rank, cb){
 
 function getAllGamesFromUser(user_id, cb) {
     let connection = mysql.createConnection(config.db);
-    connection.connect((err)=> {
-        if(err){
+    connection.connect((err) => {
+        if (err) {
             cb(err);
-        }
-        else {
+        } else {
             console.log("Connected to DB");
             let sql = "SELECT game_id from user_games where user_id = ?";
             connection.query(sql, [user_id], (error, data) => {
                 connection.end();
-                if(error){
+                if (error) {
                     cb(error);
                     console.log(error);
-                }
-                else {
+                } else {
                     cb(error, data.map(dataToGames));
                 }
             });
@@ -80,19 +76,17 @@ function getAllGamesFromUser(user_id, cb) {
 
 function getAllUsersFromGame(game_id, cb) {
     let connection = mysql.createConnection(config.db);
-    connection.connect((err)=> {
-        if(err){
+    connection.connect((err) => {
+        if (err) {
             cb(err);
-        }
-        else {
+        } else {
             console.log("Connected to DB");
             let sql = "SELECT user_id from user_games where game_id = ?";
             connection.query(sql, [game_id], (error, data) => {
                 connection.end();
-                if(error){
+                if (error) {
                     cb(error);
-                }
-                else {
+                } else {
                     cb(error, data.map(userIdToUser));
                 }
             });
