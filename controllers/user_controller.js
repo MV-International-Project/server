@@ -1,11 +1,12 @@
 "use strict";
 
+const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
 
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
-        throw "Bad request";
+        throw new AppError(400, "Bad request");
     }
 
     // Get ID using access token and make
@@ -13,12 +14,12 @@ async function registerUser(username, description, accessToken, refreshToken) {
     let uid = user.id;
 
     if(uid == null) {
-        throw "User not found";
+        throw new AppError(404, "User not found");
     }
 
     // Make sure the user doesn't already exist.
     if(await userRepository.getUserFromId(uid) != null) {
-        throw "This user is already registered.";
+        throw new AppError(400, "This user is already registered.");
     }
 
     // Register user in userRepository
