@@ -112,39 +112,12 @@ function updateTokens(userId, discordName, accessToken, refreshToken) {
     });   
 }
 
-function addGameToBlackList(userId, gameId) {
-  return new Promise((resolve, reject) => {
-
-    let connection = mysql.createConnection(config.db);
-
-    connection.connect((error)=>{
-            if(error){
-                reject(error);
-            }
-            else {
-                let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
-
-                connection.query(sql, [userId, gameId], (err, result) => {
-                    connection.end();
-                    if(err){
-                        reject(err);
-                    }
-                    else {
-                      if (result.affectedRows == 0) {
-                          reject("This game is already on your blacklist!")
-                      }
-                        resolve(true);
-                    }
-                })
-            }
-        });
-  });
-}
 
 
-module.exports= {
+
+
+module.exports={
     addUser,
     getUserFromId,
-    updateTokens,
-    addGameToBlackList
+    updateTokens
 };
