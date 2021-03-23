@@ -180,11 +180,17 @@ paths:
                 $ref: "#/components/schemas/MatchedUser"
         '404':
           description: "Match not found."
-  /users/game:
+  /users/games/{id}:
     post:
       description: "Add a game to the user's games."
       tags:
         - "User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
       requestBody:
         required: true
         content:
@@ -192,8 +198,6 @@ paths:
             schema:
               type: object
               properties:
-                game_id:
-                  type: integer
                 hours_played:
                   type: integer
                 rank:
@@ -201,14 +205,13 @@ paths:
       responses:
         '200':
           description: "OK, added game to the user"
-  /users/{game_id}:
     delete:
       description: "Remove a game from the user's games."
       tags:
         - "User"
       parameters:
         - in: path
-          name: game_id
+          name: id
           schema:
             type: integer
           required: true

@@ -39,12 +39,9 @@ async function removeGameFromBlackList(userId, gameId) {
 }
 
 
-async function connectGameToUser(uid, gid, hoursPlayed, rank){
+async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
     if(uid == null || gid == null){
         throw new AppError(400, "Bad request");
-    }
-    if(hoursPlayed == null){
-        hoursPlayed = 0;
     }
     if(await userRepository.getUserFromId(uid) == null) {
         throw new AppError(404, "User not found.");
