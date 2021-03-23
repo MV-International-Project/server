@@ -64,6 +64,13 @@ router.post("/users/login", (req, res, next) => {
         .catch(next);
 });
 
+router.get("/user", authenticateJWT, (req, res, next) => {
+    const userId = req.user_id;
+    userController.getUserInformation(userId).then(user => {
+        res.status(200).json(user);
+    }).catch(next);
+});
+
 router.post("/users/game", (req, res, next) => {
     let body = req.body;
     let user_id = body.user_id;
