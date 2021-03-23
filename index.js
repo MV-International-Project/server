@@ -10,6 +10,7 @@ const userRepo = require("./repositories/user_repository");
 
 const http = require("http");
 const express = require("express");
+const jwt = require('jsonwebtoken');
 const colors = require("colors");
 
 const app = express();
@@ -27,6 +28,27 @@ function errorHandler(err, req, res, next) {
         .json({error: err});
     }
 }
+
+/*
+    Authentication middleware
+*/
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1]; // Bearer TOKEN
+
+        jwt.verify(token, config.jsonwebtoken.key, (err, payload) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+            req.user_id = payload.id;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};
 
 /*
     API requests
@@ -70,9 +92,7 @@ router.post("/users/game", (req, res) => {
             res.end("succeeded");
         }
     });
-
 });
-
 
 router.post("/users/blacklist/:game_id", (req, res, next) => {
     let params = req.params;
