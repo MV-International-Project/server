@@ -16,14 +16,14 @@ app.use(errorHandler);
 function errorHandler(err, req, res, next) {
     console.log(err);
     res.status(500)
-    .json({error: err});
+        .json({error: err});
 }
 
 /*
     API requests
 */
-const router = express.Router()
-app.use('/api', router)
+const router = express.Router();
+app.use('/api', router);
 
 const server = http.createServer(app);
 const port = config.port;
