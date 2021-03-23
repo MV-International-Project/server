@@ -76,13 +76,21 @@ router.post("/users/login", (req, res, next) => {
         .catch(next);
 });
 
-router.post("/users/game", (req, res, next) => {
+router.post("/users/game", authenticateJWT, (req, res, next) => {
     let body = req.body;
-    let user_id = body.user_id;
+    let user_id = req.user_id;
     let game_id = body.game_id;
     let hours_played = body.hours_played;
     let rank = body.rank;
-    userController.connectGameToUser(user_id, game_id, hours_played, rank)
+    userGamesController.connectGameToUser(user_id, game_id, hours_played, rank)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
+router.delete("/users/:game_id", authenticateJWT, (req, res, next) => {
+    let userId = req.user_id;
+    let gameId = req.params.game_id;
+    userGamesController.removeGameFromUser(userId, gameId)
         .then(result => res.status(200).json(result))
         .catch(next);
 });

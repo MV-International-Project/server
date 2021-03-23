@@ -77,20 +77,9 @@ async function changeDescription(uid, description){
     return await userRepository.changeDescription(uid, description);
 }
 
-async function connectGameToUser(uid, gid, hoursPlayed, rank){
-    if(uid == null || gid == null){
-        throw new AppError(400, "Bad request");
-    }
-    if(hoursPlayed == null){
-        hoursPlayed = 0;
-    }
-    return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
-}
-
 module.exports = {
     registerUser,
     loginUser,
-    connectGameToUser,
     changeDescription
 };
 
