@@ -27,10 +27,8 @@ async function registerUser(username, description, accessToken, refreshToken) {
         throw new AppError(400, "This user is already registered.");
     }
 
-    let discordName = `${user.username}#${user.discriminator}`;
-
     // Register user in userRepository
-    await userRepository.addUser(uid, username, discordName, 
+    await userRepository.addUser(uid, username, getDiscordTag(user), 
         description, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
@@ -51,15 +49,26 @@ async function loginUser(accessToken, refreshToken) {
         throw new AppError(404, "User not found.");
     }
 
-    let discordName = `${user.username}#${user.discriminator}`;
-
     // Login user and update his access / refresh tokens
-    await userRepository.updateTokens(uid, discordName, accessToken, refreshToken);
+    await userRepository.updateTokens(uid, getDiscordTag(user), accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
 
     return {token: userToken};
+}
+
+async function getUserInformation(userId) {
+    const user = await userRepository.getUserFromId(userId);
+    
+    if(user == null) {
+        throw new AppError(404, "Authenticated user not found.");
+    }
+
+    const discordTokens = await userRepository.getTokens(userId);
+    const discordUser = await discordRepository.getUser(discordTokens.accessToken);
+
+    return mapUserObject(user, discordUser);
 }
 
 async function changeDescription(uid, description){
@@ -77,9 +86,29 @@ async function changeDescription(uid, description){
     return await userRepository.changeDescription(uid, description);
 }
 
+function getDiscordTag(discordUser) {
+    return `${discordUser.username}#${discordUser.discriminator}`;
+}
+
+function getAvatarPath(discordUser) {
+    return `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+}
+
+function mapUserObject(user, discordUser) {
+    return {
+        id: user.user_id,
+        username: user.username,
+        avatar_path: getAvatarPath(discordUser),
+        description: user.description,
+        games: [],
+        discord_tag: getDiscordTag(discordUser)
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
+    getUserInformation,
     changeDescription
 };
 
