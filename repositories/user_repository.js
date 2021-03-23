@@ -16,11 +16,11 @@ function addUser(user_id ,username, description) {
   let connection =  mysql.createConnection(config.db);
         connection.connect( (error)=>{
             if(error){
-                reject(err);
+                reject(error);
             }
             else {
                 console.log("Connected to DB");
-                let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?,?)";
+                let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
                 connection.query(sql, [user_id,username, description], (err) =>{
                     connection.end();
                     if(err){
