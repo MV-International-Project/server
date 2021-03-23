@@ -5,7 +5,7 @@ const { AppError } = require('../errors');
 
 function dataToUser(data) {
     const user = {
-        userId: data.userId,
+        user_id: data.user_id,
         username: data.username,
         description: data.description,
         last_login: data.last_login
@@ -77,7 +77,33 @@ function getUserFromId(userId) {
                     }
                     else {
                         if(data.length === 0) resolve(null);
-                        resolve(data.map(dataToUser));
+                        resolve(dataToUser(data[0]));
+                    }
+                })
+            }
+        });
+    });
+}
+
+function getTokens(userId) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "SELECT * from discord where user_id = ?";
+                connection.query(sql, [userId], (err, data) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve({
+                            accessToken: data[0].access_token,
+                            refreshToken: data[0].refresh_token
+                        });
                     }
                 })
             }
@@ -138,5 +164,6 @@ module.exports={
     addUser,
     getUserFromId,
     changeDescription,
+    getTokens,
     updateTokens
 };
