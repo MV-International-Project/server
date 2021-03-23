@@ -4,8 +4,7 @@ const config = require("../config");
 const ENDPOINT = "https://discord.com/api/v8";
 const fetch = require('node-fetch');
 
-function fetchWithAccessToken(url, options = {}) {
-    const token = "RmZFuimTOyFev1lub4iOVzl6bnY0uJ";
+function fetchWithAccessToken(url, token, options = {}) {
     let optionsWithToken = options;
     if(token != null) {
         if(optionsWithToken.headers == null) {
@@ -36,9 +35,10 @@ function refreshAccessToken() {
     .catch(err => reject(err));
 }
 
-function getUser() {
+function getUser(accessToken) {
     return new Promise((resolve, reject) => {
         fetchWithAccessToken(`${ENDPOINT}/users/@me`, 
+        accessToken,
         {
             method: "GET",
         })

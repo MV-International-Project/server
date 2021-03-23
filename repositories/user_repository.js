@@ -54,7 +54,7 @@ function getUserFromId(user_id) {
                 })
             }
         });
-    }
+    });
 }
 
 module.exports={
