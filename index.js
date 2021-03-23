@@ -8,6 +8,7 @@ const userGamesController = require("./controllers/user_games_controller");
 
 const http = require("http");
 const express = require("express");
+const jwt = require('jsonwebtoken');
 const colors = require("colors");
 
 const app = express();
@@ -25,6 +26,27 @@ function errorHandler(err, req, res, next) {
             .json({error: err});
     }
 }
+
+/*
+    Authentication middleware
+*/
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1]; // Bearer TOKEN
+
+        jwt.verify(token, config.jsonwebtoken.key, (err, payload) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+            req.user_id = payload.id;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};
 
 /*
     API requests
@@ -74,7 +96,6 @@ router.patch("/users/description", (req, res, next) => {
         .then(result => res.status(200).json(result))
         .catch(next);
 });
-
 
 router.post("/users/blacklist/:game_id", (req, res, next) => {
     let params = req.params;
