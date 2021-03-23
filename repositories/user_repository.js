@@ -19,7 +19,6 @@ function addUser(user_id ,username, description) {
                 reject(error);
             }
             else {
-                console.log("Connected to DB");
                 let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
                 connection.query(sql, [user_id,username, description], (err) =>{
                     connection.end();
@@ -43,7 +42,6 @@ function getUserFromId(user_id) {
                 reject(error);
             }
             else {
-                console.log("Connected to DB");
                 let sql = "SELECT * from users where user_id = ?";
                 connection.query(sql, [user_id], (err, data) => {
                     connection.end();
