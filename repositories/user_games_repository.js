@@ -158,6 +158,34 @@ function removeGameFromBlackList(userId, gameId) {
   });
 }
 
+
+function acceptPendingMatch(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = `INSERT into matches(first_user, second_user) VALUES(?, ?);\
+                DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?`;
+
+                connection.query(sql, [suggestedUserId, userId, suggestedUserId, userId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
