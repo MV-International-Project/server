@@ -54,7 +54,29 @@ function getUserFromId(user_id, cb) {
     });
 }
 
+
+function addGameToBlackList(user_id, game_id) {
+  return new Promise((success, failed) => {
+
+    let connection = mysql.createConnection(config.db);
+    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ?";
+
+    connection.query(sql, [user_id, game_id], (err) => {
+      connection.end();
+
+      if(err){
+          failed(err);
+          return;
+      }
+
+      success(true);
+    });
+  });
+}
+
+
 module.exports={
     addUser,
     getUserFromId
+    addGameToBlackList
 };
