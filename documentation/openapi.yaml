@@ -47,7 +47,7 @@ paths:
           description: "OK, registered user."
         '400':
           description: "Bad request"
-  /users/{id}/registered:
+  /users/{user_id}/registered:
     get:
       description: "API call to check if a certain ID is registered or not"
       tags:
@@ -118,7 +118,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  /users/matchSuggestion/{id}:
+  /users/matchSuggestion/{user_id}:
     patch:
       description: "API call to indicate whether you accept or reject a user."
       tags:
