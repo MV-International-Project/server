@@ -95,10 +95,9 @@ router.delete("/users/:game_id", authenticateJWT, (req, res, next) => {
         .catch(next);
 });
 
-router.patch("/users/description", (req, res, next) => {
+router.patch("/users/description", authenticateJWT, (req, res, next) => {
     let body = req.body;
-    //TODO: Get the uid with authentication instead of trough the body.
-    let uid = body.user_id;
+    let uid = req.user_id;
     let description = body.description;
     userController.changeDescription(uid, description)
         .then(result => res.status(200).json(result))
