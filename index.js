@@ -66,11 +66,11 @@ router.post("/users/game", (req, res) => {
 
 router.post("/users/blacklist/:game_id", (req, res, next) => {
     let params = req.params;
-    let game_id = params.game_id;
+    let gameId = params.game_id;
     // TEMP user id
-    let user_id = 1;
+    let userId = 1;
 
-    userRepo.addGameToBlackList(user_id, game_id)
+    userRepo.addGameToBlackList(userId, gameId)
     .then(result => res.status(200).json(result))
     .catch(next);
         

@@ -1,5 +1,7 @@
 const mysql = require("mysql");
 const config = require("../config");
+const { AppError } = require('../errors');
+
 
 function dataToUser(data) {
     const user = {
@@ -58,7 +60,7 @@ function getUserFromId(user_id) {
 }
 
 
-function addGameToBlackList(user_id, game_id) {
+function addGameToBlackList(userId, gameId) {
   return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
@@ -70,14 +72,15 @@ function addGameToBlackList(user_id, game_id) {
             else {
                 let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
 
-                connection.query(sql, [user_id, game_id], (err, result) => {
+                connection.query(sql, [userId, gameId], (err, result) => {
                     connection.end();
                     if(err){
                         reject(err);
                     }
                     else {
-                        affectedRows = result.affectedRows;
-                        console.log(affectedRows);
+                      if (result.affectedRows == 0) {
+                          reject("This game is already on your blacklist!")
+                      }
                         resolve(true);
                     }
                 })
