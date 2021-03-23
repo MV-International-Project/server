@@ -174,7 +174,7 @@ function resetBlacklist(userId) {
                     }
                     else {
                       if (result.affectedRows == 0) {
-                          reject("Your blacklist is already empty!")
+                          reject("There are nog games on your blacklist!")
                       }
                         resolve(true);
                     }

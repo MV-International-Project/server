@@ -232,6 +232,16 @@ paths:
           description: "OK, deleted game from the user's blacklist"  
         '404':
           description: 'Game not found in blacklist'
+  /users/blacklist:
+    delete:
+      description: "Remove all the games from the user's blacklist."
+      tags:
+        - "User"
+      responses:
+        '200':
+          description: "OK, removed all games from the user's blacklist"
+        '404':
+          description: "There are nog games on the user's blacklist"
   /games:
     get:
       description: "Retrieve all games with their information."
