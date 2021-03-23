@@ -5,7 +5,7 @@ const { AppError } = require('../errors');
 
 function dataToUser(data) {
     const user = {
-        user_id: data.user_id,
+        userId: data.userId,
         username: data.username,
         description: data.description,
         last_login: data.last_login
@@ -13,30 +13,55 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(user_id ,username, description) {
-  return new Promise((resolve, reject) => {
-  let connection =  mysql.createConnection(config.db);
-        connection.connect( (error)=>{
-            if(error){
-                reject(error);
-            }
-            else {
-                let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
-                connection.query(sql, [user_id,username, description], (err) =>{
+function addUser(userId, username, discordName, description, accessToken, refreshToken) {
+    let connection =  mysql.createConnection(config.db);
+    return new Promise((resolve, reject) => {
+    // Transaction to add user and his discord information
+        connection.beginTransaction(function(err) {
+
+            // Add user to the users table
+            let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
+            connection.query(sql, [userId, username, description], (err) =>{
+                if(err){
+                    reject(err);
                     connection.end();
-                    if(err){
+                    return;
+                }
+                else {
+                    resolve(true);
+                }
+            });
+
+            // Add the users discord information
+            sql = `INSERT INTO discord(user_id, discord_id, access_token, refresh_token)
+            VALUES(?, ?, ?, ?);`;
+            connection.query(sql, [userId, discordName, accessToken, refreshToken], (err) => {
+                connection.end();
+                if(err){
+                    reject(err);
+                }
+                else {
+                    resolve(true);
+                }
+            });
+
+            // Commit transaction if previous queries were succesful
+            connection.commit(err => {
+                if(err) {
+                    connection.rollback(() => {
                         reject(err);
-                    }
-                    else {
-                        resolve(true);
-                    }
-                })
-            }
+                        connection.end();  
+                        return;
+                    });
+                }
+
+                resolve(true);
+            });
         });
     });
 }
 
-function getUserFromId(user_id) {
+function getUserFromId(userId) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((error)=>{
@@ -45,12 +70,13 @@ function getUserFromId(user_id) {
             }
             else {
                 let sql = "SELECT * from users where user_id = ?";
-                connection.query(sql, [user_id], (err, data) => {
+                connection.query(sql, [userId], (err, data) => {
                     connection.end();
                     if(err){
                         reject(err);
                     }
                     else {
+                        if(data.length === 0) resolve(null);
                         resolve(data.map(dataToUser));
                     }
                 })
@@ -59,6 +85,32 @@ function getUserFromId(user_id) {
     });
 }
 
+function updateTokens(userId, discordName, accessToken, refreshToken) {
+    return new Promise((resolve, reject) => {
+        let connection =  mysql.createConnection(config.db);
+            connection.connect( (error) =>{
+                if(error){
+                    reject(error);
+                }
+                else {
+                    let sql = `UPDATE discord 
+                    SET discord_id = ?,
+                    access_token = ?, 
+                    refresh_token = ?
+                    WHERE user_id = ?`;
+                    connection.query(sql, [discordName,accessToken,refreshToken,userId], (err) =>{
+                        connection.end();
+                        if(err){
+                            reject(err);
+                        }
+                        else {
+                            resolve(true);
+                        }
+                    });
+                }
+            });
+    });   
+}
 
 function addGameToBlackList(userId, gameId) {
   return new Promise((resolve, reject) => {
@@ -90,8 +142,9 @@ function addGameToBlackList(userId, gameId) {
 }
 
 
-module.exports={
+module.exports= {
     addUser,
     getUserFromId,
+    updateTokens,
     addGameToBlackList
 };
