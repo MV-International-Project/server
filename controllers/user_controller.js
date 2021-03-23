@@ -5,11 +5,8 @@ const config = require('../config');
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
-<<<<<<< HEAD
-const jwt = require('jsonwebtoken');
-=======
 const userGamesRepository = require("../repositories/user_games_repository");
->>>>>>> c261acef8e6af8882bf57defa4e83bdf2bc4dbdf
+const jwt = require('jsonwebtoken');
 
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
