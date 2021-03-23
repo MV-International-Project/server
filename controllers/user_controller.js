@@ -58,6 +58,11 @@ async function changeDescription(uid, description){
     if(description.length > 100){
         throw new AppError(400, "This description is too long.");
     }
+
+    if(await userRepository.getUserFromId(uid) == null){
+        throw new AppError(404, "User not found");
+    }
+
     return await userRepository.changeDescription(uid, description);
 }
 
