@@ -1,8 +1,11 @@
 "use strict";
 
+const config = require('../config');
+
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
+const jwt = require('jsonwebtoken');
 
 async function registerUser(username, description, accessToken, refreshToken) {
     if(username == null || description == null || accessToken == null || refreshToken == null) {
@@ -26,8 +29,12 @@ async function registerUser(username, description, accessToken, refreshToken) {
     let discordName = `${user.username}#${user.discriminator}`;
 
     // Register user in userRepository
-    return await userRepository.addUser(uid, username, discordName, 
+    await userRepository.addUser(uid, username, discordName, 
         description, accessToken, refreshToken);
+
+    // Get a JSON web token and return it to the user
+    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+    return {token: userToken};
 }
 
 async function loginUser(accessToken, refreshToken) {
@@ -47,7 +54,11 @@ async function loginUser(accessToken, refreshToken) {
 
     // Login user and update his access / refresh tokens
     await userRepository.updateTokens(uid, discordName, accessToken, refreshToken);
-    return true;
+
+    // Get a JSON web token and return it to the user
+    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+
+    return {token: userToken};
 }
 
 module.exports = {
