@@ -18,6 +18,7 @@ app.use(express.json());
     Error handler
 */
 function errorHandler(err, req, res, next) {
+	console.log(err);
     if (err instanceof AppError) {
         res.status(err.statusCode)
             .json({error: err.message});
@@ -109,41 +110,35 @@ router.post("/users/blacklist/:game_id", (req, res, next) => {
 
 });
 
-router.delete("/users/matchSuggestion/:user_id", (req, res, next) => {
+router.delete("/users/blacklist/:game_id", (req, res, next) => {
+    let params = req.params;
+    let gameId = params.game_id;
+    // TEMP user id
+    let userId = 1;
+
+    userGamesController.removeGameFromBlackList(userId, gameId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+
+});
+
+router.patch("/users/matchSuggestion/:user_id", (req, res, next) => {
     let suggestedUserId = req.params.user_id;
+    let body = req.body;
+    let accepted = body.accept;
     // TEMP user id
-    let userId = 1;
+    let userId = 2;
 
-    userGamesController.removeGameFromBlackList(userId, gameId)
+    userGamesController.respondToMatchSuggestion(userId, suggestedUserId, accepted)
         .then(result => res.status(200).json(result))
         .catch(next);
 
 });
 
 
-router.patch("/users/blacklist/:game_id", (req, res, next) => {
-    let params = req.params;
-    let gameId = params.game_id;
-    // TEMP user id
-    let userId = 1;
 
-    userGamesController.removeGameFromBlackList(userId, gameId)
-        .then(result => res.status(200).json(result))
-        .catch(next);
 
-});
 
-router.patch("/users/blacklist/:game_id", (req, res, next) => {
-    let params = req.params;
-    let gameId = params.game_id;
-    // TEMP user id
-    let userId = 1;
-
-    userGamesController.removeGameFromBlackList(userId, gameId)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-
-});
 
 
 router.post("/test", (req, res) => {

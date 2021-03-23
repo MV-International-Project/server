@@ -191,7 +191,7 @@ function checkPendingMatches(userId, suggestedUserId) {
                 reject(error);
             }
             else {
-                let sql = `SELECT Count(*) FROM pending_matches WHERE first_user = ? AND second_user = ? AND accepted = 1`;
+                let sql = `SELECT accepted FROM pending_matches WHERE first_user = ? AND second_user = ? AND accepted = 1`;
 
                 connection.query(sql, [suggestedUserId, userId], (err, result) => {
                     connection.end();
@@ -222,7 +222,7 @@ function acceptMatchSuggestion(userId, suggestedUserId) {
                 reject(error);
             }
             else {
-                let sql = "INSERT INTO pending_matches(first_user, second_user) VALUES(?, ?)";
+                let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 1)";
 
                 connection.query(sql, [userId, suggestedUserId], (err, result) => {
                     connection.end();
@@ -264,7 +264,7 @@ function newMatch(userId, suggestedUserId) {
                 });
 
 
-                let sql = `DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?;`;
+                sql = `DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?;`;
 
                 connection.query(sql, [suggestedUserId, userId], (err, result) => {
                     
@@ -305,5 +305,7 @@ module.exports = {
     addGameToBlackList,
     removeGameFromBlackList,
     acceptMatchSuggestion,
-    removeGameFromUser
+    removeGameFromUser,
+    checkPendingMatches,
+    newMatch
 };

@@ -49,18 +49,17 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     }
 
     // Accept match
-    if (accepted == "true") {
-        if (true) {
+    if (accepted) {
+        if (await userGamesRepository.checkPendingMatches(userId, suggestedUserId)) {
             await userGamesRepository.newMatch(userId, suggestedUserId);
-
-
         } else {
-            await userGamesRepository.acceptPendingMatch(userId, suggestedUserId);
+            await userGamesRepository.acceptMatchSuggestion(userId, suggestedUserId);
         }
     } else {
         //await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
     }
     return true;
+}
 
 async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
     if(uid == null || gid == null){
@@ -87,5 +86,6 @@ module.exports = {
     addGameToBlackList,
     removeGameFromBlackList,
     connectGameToUser,
-    removeGameFromUser
+    removeGameFromUser,
+    respondToMatchSuggestion
 };
