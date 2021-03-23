@@ -9,10 +9,11 @@ async function registerUser(username, description, accessToken, refreshToken) {
         throw new AppError(400, "Bad request");
     }
 
-    // Get ID using access token and make
+    // Get user ID using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
 
+    // Make sure the user exists
     if(uid == null) {
         throw new AppError(404, "User not found");
     }
@@ -26,4 +27,25 @@ async function registerUser(username, description, accessToken, refreshToken) {
     return await userRepository.addUser(uid, username, description);
 }
 
-module.exports = {registerUser};
+async function loginUser(accessToken, refreshToken) {
+    if(accessToken == null || refreshToken == null) {
+        throw new AppError(400, "Bad request");
+    }
+
+    let user = await discordRepository.getUser(accessToken);
+    let uid = user.id;
+    
+    // Make sure the user exists
+    if(await userRepository.getUserFromId(uid) == null) {
+        throw new AppError(404, "User not found.");
+    }
+
+    // Login user and update his access / refresh tokens
+    await userRepository.updateTokens(uid, accessToken, refreshToken);
+    return true;
+}
+
+module.exports = {
+    registerUser,
+    loginUser
+};

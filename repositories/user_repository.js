@@ -3,7 +3,7 @@ const config = require("../config");
 
 function dataToUser(data) {
     const user = {
-        user_id: data.user_id,
+        userId: data.userId,
         username: data.username,
         description: data.description,
         last_login: data.last_login
@@ -11,7 +11,7 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(user_id ,username, description) {
+function addUser(userId ,username, description) {
   return new Promise((resolve, reject) => {
   let connection =  mysql.createConnection(config.db);
         connection.connect( (error)=>{
@@ -20,7 +20,7 @@ function addUser(user_id ,username, description) {
             }
             else {
                 let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
-                connection.query(sql, [user_id,username, description], (err) =>{
+                connection.query(sql, [userId,username, description], (err) =>{
                     connection.end();
                     if(err){
                         reject(err);
@@ -34,7 +34,7 @@ function addUser(user_id ,username, description) {
     });
 }
 
-function getUserFromId(user_id) {
+function getUserFromId(userId) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((error)=>{
@@ -43,7 +43,7 @@ function getUserFromId(user_id) {
             }
             else {
                 let sql = "SELECT * from users where user_id = ?";
-                connection.query(sql, [user_id], (err, data) => {
+                connection.query(sql, [userId], (err, data) => {
                     connection.end();
                     if(err){
                         reject(err);
@@ -57,7 +57,34 @@ function getUserFromId(user_id) {
     });
 }
 
+function updateTokens(userId, accessToken, refreshToken) {
+    return new Promise((resolve, reject) => {
+        let connection =  mysql.createConnection(config.db);
+            connection.connect( (error) =>{
+                if(error){
+                    reject(error);
+                }
+                else {
+                    let sql = `UPDATE discord 
+                    SET access_token = ?, 
+                    refresh_token = ?
+                    WHERE user_id = ?`;
+                    connection.query(sql, [accessToken,refreshToken,userId], (err) =>{
+                        connection.end();
+                        if(err){
+                            reject(err);
+                        }
+                        else {
+                            resolve(true);
+                        }
+                    })
+                }
+            });
+    });   
+}
+
 module.exports={
     addUser,
+    updateTokens,
     getUserFromId
 };
