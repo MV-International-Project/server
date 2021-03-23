@@ -133,6 +133,18 @@ router.patch("/users/blacklist/:game_id", (req, res, next) => {
 
 });
 
+router.patch("/users/blacklist/:game_id", (req, res, next) => {
+    let params = req.params;
+    let gameId = params.game_id;
+    // TEMP user id
+    let userId = 1;
+
+    userGamesController.removeGameFromBlackList(userId, gameId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+
+});
+
 
 router.post("/test", (req, res) => {
     discordRepository.getUser()

@@ -53,6 +53,28 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
     });
 }
 
+function removeGameFromUser(uid, gid) {
+    return new Promise(((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((err) =>{
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to DB");
+                let sql = "DELETE from user_games where user_id = ? and game_id = ?";
+                connection.query(sql, [uid, gid], (error) =>{
+                    connection.end();
+                    if(error){
+                        reject(error);
+                    } else {
+                        resolve();
+                    }
+                })
+            }
+        })
+    }))
+}
+
 function getAllGamesFromUser(uid) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
@@ -282,5 +304,6 @@ module.exports = {
     getAllUsersFromGame,
     addGameToBlackList,
     removeGameFromBlackList,
-    acceptMatchSuggestion
+    acceptMatchSuggestion,
+    removeGameFromUser
 };
