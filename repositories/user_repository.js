@@ -53,7 +53,6 @@ function addUser(userId ,username, description, accessToken, refreshToken) {
                     });
                 }
 
-                connect.end();
                 resolve(true);
             });
         });
@@ -75,6 +74,7 @@ function getUserFromId(userId) {
                         reject(err);
                     }
                     else {
+                        if(data.length === 0) resolve(null);
                         resolve(data.map(dataToUser));
                     }
                 })
