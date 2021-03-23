@@ -8,6 +8,7 @@ const user_games_repo = require("./repositories/user_games_repository");
 
 const http = require("http");
 const express = require("express");
+const colors = require("colors");
 
 const app = express();
 app.use(express.json());
@@ -71,3 +72,5 @@ app.use(errorHandler);
 const server = http.createServer(app);
 const port = config.port;
 server.listen(port);
+
+console.log(colors.brightBlue(`International Project 06 back-end up and running at port ${port}`));
