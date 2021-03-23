@@ -60,7 +60,7 @@ paths:
             $ref: "#/components/schemas/user_id"
       responses:
         '200':
-          description: "Boolean to show if the user is registered or not."     
+          description: "Boolean to show if the user is registered or not."
           content:
             application/json:
               schema:
@@ -229,7 +229,7 @@ paths:
           required: true
       responses:
         '200':
-          description: "OK, deleted game from the user's blacklist"  
+          description: "OK, deleted game from the user's blacklist"
         '404':
           description: 'Game not found in blacklist'
   /users/blacklist:
@@ -242,10 +242,29 @@ paths:
           description: "OK, removed all games from the user's blacklist"
         '404':
           description: "There are nog games on the user's blacklist"
+  /users/description:
+    patch:
+      description: "Modify the user's profile description."
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+      responses:
+        '200':
+          description: "OK, modified description"
+        '404':
+          description: "User not found: unable to change description"
   /games:
     get:
       description: "Retrieve all games with their information."
-      tags: 
+      tags:
         - "Game"
       responses:
         '200':

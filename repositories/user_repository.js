@@ -85,6 +85,28 @@ function getUserFromId(userId) {
     });
 }
 
+function changeDescription(uid, description){
+    return new Promise(((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE users SET description = ? where user_id = ?";
+                connection.query(sql, [description, uid], (err) => {
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve();
+                    }
+                })
+            }
+        })
+    }))
+}
+
 function updateTokens(userId, discordName, accessToken, refreshToken) {
     return new Promise((resolve, reject) => {
         let connection =  mysql.createConnection(config.db);
@@ -112,12 +134,9 @@ function updateTokens(userId, discordName, accessToken, refreshToken) {
     });   
 }
 
-
-
-
-
 module.exports={
     addUser,
     getUserFromId,
+    changeDescription,
     updateTokens
 };
