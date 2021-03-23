@@ -159,7 +159,7 @@ function removeGameFromBlackList(userId, gameId) {
 }
 
 
-function acceptPendingMatch(userId, suggestedUserId) {
+function checkPendingMatches(userId, suggestedUserId) {
   return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
@@ -169,10 +169,40 @@ function acceptPendingMatch(userId, suggestedUserId) {
                 reject(error);
             }
             else {
-                let sql = `INSERT into matches(first_user, second_user) VALUES(?, ?);\
-                DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?`;
+                let sql = `SELECT Count(*) FROM pending_matches WHERE first_user = ? AND second_user = ? AND accepted = 1`;
 
-                connection.query(sql, [suggestedUserId, userId, suggestedUserId, userId], (err, result) => {
+                connection.query(sql, [suggestedUserId, userId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        if (result.length > 0) {
+                            resolve(true);
+                        }
+                        resolve(false);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
+
+function acceptMatchSuggestion(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "INSERT INTO pending_matches(first_user, second_user) VALUES(?, ?)";
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
                     connection.end();
                     if(err){
                         reject(err);
@@ -186,10 +216,71 @@ function acceptPendingMatch(userId, suggestedUserId) {
   });
 }
 
+
+function newMatch(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+     connection.beginTransaction(function(error) {
+
+            if(error){
+                reject(error);
+                connection.end();
+            }
+            else {
+                let sql = `INSERT INTO matches(first_user, second_user) VALUES(?, ?);`;
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
+                    
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                });
+
+
+                let sql = `DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?;`;
+
+                connection.query(sql, [suggestedUserId, userId], (err, result) => {
+                    
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+
+            }
+
+            
+            // Commit transaction if previous queries were succesful
+            connection.commit(error => {
+                if(error) {
+                    connection.rollback(() => {
+                        reject(error);
+                        connection.end();  
+                        return;
+                    });
+                }
+
+                resolve(true);
+            });
+        });
+
+
+
+  });
+}
+
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
     getAllUsersFromGame,
     addGameToBlackList,
-    removeGameFromBlackList
+    removeGameFromBlackList,
+    acceptMatchSuggestion
 };

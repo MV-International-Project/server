@@ -38,7 +38,7 @@ async function removeGameFromBlackList(userId, gameId) {
     return true;
 }
 
-async function respondToPendingMatch(userId, suggestedUserId, accepted) {
+async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     if(userId == null || suggestedUserId == null || accepted == null) {
         throw new AppError(400, "Bad request");
     }
@@ -50,7 +50,12 @@ async function respondToPendingMatch(userId, suggestedUserId, accepted) {
 
     // Accept match
     if (accepted == "true") {
-        await userGamesRepository.acceptPendingMatch(userId, suggestedUserId);
+        if (true) {
+            await userGamesRepository.newMatch(userId, suggestedUserId);
+
+        } else {
+            await userGamesRepository.acceptPendingMatch(userId, suggestedUserId);
+        }
     } else {
         //await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
     }
