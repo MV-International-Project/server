@@ -11,7 +11,7 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(user_id ,username, description, last_login ,cb) {
+function addUser(user_id ,username, description ,cb) {
   let connection =  mysql.createConnection(config.db);
   connection.connect( (error)=>{
       if(error){
@@ -19,8 +19,8 @@ function addUser(user_id ,username, description, last_login ,cb) {
       }
       else {
           console.log("Connected to DB");
-          let sql = "INSERT into users(user_id ,username, description, last_login) VALUES(?,?,?,?)";
-          connection.query(sql, [user_id,username, description, last_login], (err) =>{
+          let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
+          connection.query(sql, [user_id,username, description], (err) =>{
               if(err){
                   cb(err);
               }
