@@ -45,7 +45,7 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
                     if (error) {
                         reject(error);
                     } else {
-                        resolve(true);
+                        resolve();
                     }
                 })
             }
@@ -54,7 +54,7 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
 }
 
 function getAllGamesFromUser(uid) {
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
             if (err) {
@@ -77,7 +77,7 @@ function getAllGamesFromUser(uid) {
 }
 
 function getAllUsersFromGame(gid) {
-    return new Promise((reject, resolve) =>{
+    return new Promise((resolve, reject) =>{
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
             if (err) {

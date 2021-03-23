@@ -54,6 +54,16 @@ router.post("/users/game", (req, res, next) => {
         .catch(next);
 });
 
+router.patch("/users/description", (req, res, next) =>{
+    let body = req.body;
+    //TODO: Get the uid with authentication instead of trough the body.
+    let uid = body.user_id;
+    let description = body.description;
+    userController.changeDescription(uid, description)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
 router.post("/test", (req, res) => {
     discordRepository.getUser()
     .then(user => res.status(200).json(user))

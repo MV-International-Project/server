@@ -58,7 +58,30 @@ function getUserFromId(user_id) {
     });
 }
 
+function changeDescription(uid, description){
+    return new Promise(((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE users SET description = ? where user_id = ?";
+                connection.query(sql, [description, uid], (err) => {
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve();
+                    }
+                })
+            }
+        })
+    }))
+}
+
 module.exports={
     addUser,
-    getUserFromId
+    getUserFromId,
+    changeDescription
 };

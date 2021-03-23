@@ -27,6 +27,16 @@ async function registerUser(username, description, accessToken, refreshToken) {
     return await userRepository.addUser(uid, username, description);
 }
 
+async function changeDescription(uid, description){
+    if(uid == null || description == null){
+        throw new AppError(400, "Bad Request");
+    }
+    if(description.length > 100){
+        throw new AppError(400, "This description is too long.");
+    }
+    return await userRepository.changeDescription(uid, description);
+}
+
 async function connectGameToUser(uid, gid, hoursPlayed, rank){
     if(uid == null || gid == null){
         throw new AppError(400, "Bad request");
@@ -37,4 +47,4 @@ async function connectGameToUser(uid, gid, hoursPlayed, rank){
     return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
 }
 
-module.exports = {registerUser, connectGameToUser};
+module.exports = {registerUser, connectGameToUser, changeDescription};
