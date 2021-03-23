@@ -35,25 +35,28 @@ function addUser(user_id ,username, description) {
     });
 }
 
-function getUserFromId(user_id, cb) {
-    let connection = mysql.createConnection(config.db);
-    connection.connect((error)=>{
-        if(error){
-            cb(error);
-        }
-        else {
-            console.log("Connected to DB");
-            let sql = "SELECT * from users where user_id = ?";
-            connection.query(sql, [user_id], (err, data) => {
-                if(err){
-                    cb(err);
-                }
-                else {
-                    cb(err, data.map(dataToUser));
-                }
-            })
-        }
-    });
+function getUserFromId(user_id) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                console.log("Connected to DB");
+                let sql = "SELECT * from users where user_id = ?";
+                connection.query(sql, [user_id], (err, data) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(data.map(dataToUser));
+                    }
+                })
+            }
+        });
+    }
 }
 
 module.exports={
