@@ -3,6 +3,8 @@
 const config = require('./config');
 
 const user_games_repo = require("./repositories/user_games_repository");
+const user_repo = require("./repositories/user_repository");
+
 
 const http = require("http");
 const express = require("express");
@@ -43,6 +45,8 @@ router.post("/users/game", (req, res) => {
     });
 
 });
+
+
 
 const server = http.createServer(app);
 const port = config.port;
