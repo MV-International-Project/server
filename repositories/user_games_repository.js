@@ -174,7 +174,7 @@ function resetBlacklist(userId) {
                     }
                     else {
                       if (result.affectedRows == 0) {
-                          reject("There are nog games on your blacklist!")
+                          reject("There are no games on your blacklist!")
                       }
                         resolve(true);
                     }
