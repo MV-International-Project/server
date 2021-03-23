@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const { discord } = require("../config");
 const config = require("../config");
 
 function dataToUser(data) {
@@ -11,7 +12,7 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(userId ,username, description, accessToken, refreshToken) {
+function addUser(userId, username, discordName, description, accessToken, refreshToken) {
     let connection =  mysql.createConnection(config.db);
     return new Promise((resolve, reject) => {
     // Transaction to add user and his discord information
@@ -19,7 +20,7 @@ function addUser(userId ,username, description, accessToken, refreshToken) {
 
             // Add user to the users table
             let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
-            connection.query(sql, [userId,username, description], (err) =>{
+            connection.query(sql, [userId, username, description], (err) =>{
                 if(err){
                     reject(err);
                     connection.end();
@@ -31,9 +32,9 @@ function addUser(userId ,username, description, accessToken, refreshToken) {
             });
 
             // Add the users discord information
-            sql = `INSERT INTO discord(user_id, access_token, refresh_token)
-            VALUES(?, ?, ?);`;
-            connection.query(sql, [userId, accessToken, refreshToken], (err) => {
+            sql = `INSERT INTO discord(user_id, discord_id, access_token, refresh_token)
+            VALUES(?, ?, ?, ?);`;
+            connection.query(sql, [userId, discordName, accessToken, refreshToken], (err) => {
                 connection.end();
                 if(err){
                     reject(err);
@@ -83,7 +84,7 @@ function getUserFromId(userId) {
     });
 }
 
-function updateTokens(userId, accessToken, refreshToken) {
+function updateTokens(userId, discordName, accessToken, refreshToken) {
     return new Promise((resolve, reject) => {
         let connection =  mysql.createConnection(config.db);
             connection.connect( (error) =>{
@@ -92,10 +93,11 @@ function updateTokens(userId, accessToken, refreshToken) {
                 }
                 else {
                     let sql = `UPDATE discord 
-                    SET access_token = ?, 
+                    SET discord_id = ?,
+                    access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-                    connection.query(sql, [accessToken,refreshToken,userId], (err) =>{
+                    connection.query(sql, [discordName,accessToken,refreshToken,userId], (err) =>{
                         connection.end();
                         if(err){
                             reject(err);

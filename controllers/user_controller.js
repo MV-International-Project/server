@@ -23,8 +23,11 @@ async function registerUser(username, description, accessToken, refreshToken) {
         throw new AppError(400, "This user is already registered.");
     }
 
+    let discordName = `${user.username}#${user.discriminator}`;
+
     // Register user in userRepository
-    return await userRepository.addUser(uid, username, description, accessToken, refreshToken);
+    return await userRepository.addUser(uid, username, discordName, 
+        description, accessToken, refreshToken);
 }
 
 async function loginUser(accessToken, refreshToken) {
@@ -40,8 +43,10 @@ async function loginUser(accessToken, refreshToken) {
         throw new AppError(404, "User not found.");
     }
 
+    let discordName = `${user.username}#${user.discriminator}`;
+
     // Login user and update his access / refresh tokens
-    await userRepository.updateTokens(uid, accessToken, refreshToken);
+    await userRepository.updateTokens(uid, discordName, accessToken, refreshToken);
     return true;
 }
 
