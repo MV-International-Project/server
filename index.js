@@ -47,6 +47,22 @@ router.post("/users/game", (req, res) => {
 });
 
 
+router.post("/users/blacklist/:game_id", (req, res) => {
+    let parms = req.params;
+    let game_id = params.game_id;
+    // TEMP user id
+    let user_id = 1;
+
+    user_repo.addGameToBlackList(user_id, game_id, (err) => {
+        if (err) {
+            errorHandler(err);
+            res.end("failed");
+        } else {
+            res.end("succeeded");
+        }
+    });
+
+});
 
 const server = http.createServer(app);
 const port = config.port;
