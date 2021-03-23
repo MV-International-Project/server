@@ -4,6 +4,7 @@ const config = require('./config');
 
 const { AppError } = require('./errors');
 const userController = require("./controllers/user_controller");
+const userRepo = require("./repositories/user_repository");
 
 const http = require("http");
 const express = require("express");
@@ -64,10 +65,26 @@ router.patch("/users/description", (req, res, next) =>{
         .catch(next);
 });
 
+
+router.post("/users/blacklist/:game_id", (req, res, next) => {
+    let params = req.params;
+    let gameId = params.game_id;
+    // TEMP user id
+    let userId = 1;
+
+    userRepo.addGameToBlackList(userId, gameId)
+    .then(result => res.status(200).json(result))
+    .catch(next);
+        
+});
+
+
+
 router.post("/test", (req, res) => {
     discordRepository.getUser()
     .then(user => res.status(200).json(user))
     .catch(err => console.log(err));
+
 });
 
 app.use(errorHandler);
