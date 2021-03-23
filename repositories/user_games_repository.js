@@ -44,11 +44,11 @@ function connectGameToUser(user_id, game_id, hours_played, rank, cb){
 
                 connection.end();
                 if(error){
-                    cb(err);
+                    cb(error);
                     console.log(error);
                 }
                 else {
-                    cb(err, true);
+                    cb(error, true);
                 }
             })
         }

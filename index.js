@@ -34,9 +34,9 @@ router.post("/users/game", (req, res) => {
     let hours_played = body.hours_played;
     let rank = body.rank;
     user_games_repo.connectGameToUser(user_id, game_id, hours_played, rank, (err, result) =>{
-
         if(err){
             errorHandler(err);
+            res.end("failed");
         }
         else {
             res.end("succeeded");
