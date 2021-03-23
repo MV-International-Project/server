@@ -59,27 +59,34 @@ function getUserFromId(user_id) {
 
 
 function addGameToBlackList(user_id, game_id) {
-  return new Promise((success, failed) => {
+  return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
-    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ?";
 
-    connection.query(sql, [user_id, game_id], (err) => {
-      connection.end();
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ?";
 
-      if(err){
-          failed(err);
-          return;
-      }
-
-      success(true);
-    });
+                connection.query(sql, [user_id, game_id], (err) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
   });
 }
 
 
 module.exports={
     addUser,
-    getUserFromId
+    getUserFromId,
     addGameToBlackList
 };

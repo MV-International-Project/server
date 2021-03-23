@@ -4,7 +4,7 @@ const config = require('./config');
 
 const userController = require("./controllers/user_controller");
 const user_games_repo = require("./repositories/user_games_repository");
-const user_repo = require("./repositories/user_repository");
+const userRepo = require("./repositories/user_repository");
 
 
 const http = require("http");
@@ -59,29 +59,26 @@ router.post("/users/game", (req, res) => {
 
 });
 
-<<<<<<< HEAD
 
-router.post("/users/blacklist/:game_id", (req, res) => {
-    let parms = req.params;
+router.post("/users/blacklist/:game_id", (req, res, next) => {
+    let params = req.params;
     let game_id = params.game_id;
     // TEMP user id
     let user_id = 1;
 
-    user_repo.addGameToBlackList(user_id, game_id, (err) => {
-        if (err) {
-            errorHandler(err);
-            res.end("failed");
-        } else {
-            res.end("succeeded");
-        }
-    });
+    userRepo.addGameToBlackList(user_id, game_id)
+    .then(result => res.status(200).json(result))
+    .catch(next);
+        
+});
 
-=======
+
+
 router.post("/test", (req, res) => {
     discordRepository.getUser()
     .then(user => res.status(200).json(user))
     .catch(err => console.log(err));
->>>>>>> 81ce8951b5676bb442cd7478cb29f19a322c4a27
+
 });
 
 const server = http.createServer(app);
