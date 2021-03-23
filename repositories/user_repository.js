@@ -68,14 +68,16 @@ function addGameToBlackList(user_id, game_id) {
                 reject(error);
             }
             else {
-                let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ?";
+                let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
 
-                connection.query(sql, [user_id, game_id], (err) => {
+                connection.query(sql, [user_id, game_id], (err, result) => {
                     connection.end();
                     if(err){
                         reject(err);
                     }
                     else {
+                        affectedRows = result.affectedRows;
+                        console.log(affectedRows);
                         resolve(true);
                     }
                 })
