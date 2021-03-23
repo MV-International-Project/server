@@ -233,7 +233,7 @@ paths:
         '404':
           description: 'Game not found in blacklist'
   /users/description:
-    post:
+    patch:
       description: "Modify the user's profile description."
       tags:
         - "User"
