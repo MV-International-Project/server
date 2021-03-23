@@ -154,10 +154,42 @@ function removeGameFromBlackList(userId, gameId) {
   });
 }
 
+
+function resetBlacklist(userId, gameId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
+
+                connection.query(sql, [userId, gameId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                      if (result.affectedRows == 0) {
+                          reject("Your blacklist is already empty!")
+                      }
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
     getAllUsersFromGame,
     addGameToBlackList,
-    removeGameFromBlackList
+    removeGameFromBlackList,
+    resetBlacklist
 };
