@@ -1,8 +1,8 @@
 "use strict";
 
 const config = require("../config");
-const ENDPOINT = "https://discord.com/api/v8";
 const fetch = require('node-fetch');
+const ENDPOINT = "https://discord.com/api/v8";
 
 function fetchWithAccessToken(url, token, options = {}) {
     let optionsWithToken = options;

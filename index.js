@@ -5,6 +5,7 @@ const config = require('./config');
 const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");
 const userGamesController = require("./controllers/user_games_controller");
+const gameRepository = require("./repositories/game_repository");
 
 const http = require("http");
 const express = require("express");
@@ -18,6 +19,7 @@ app.use(express.json());
     Error handler
 */
 function errorHandler(err, req, res, next) {
+    console.log(err);
     if (err instanceof AppError) {
         res.status(err.statusCode)
             .json({error: err.message});
@@ -123,6 +125,11 @@ router.delete("/users/blacklist/:game_id", (req, res, next) => {
 
 });
 
+router.get("/games", (req, res, next) => {
+    let search = req.query.search;
+    gameRepository.searchGames(search).then(result => res.status(200).json(result))
+    .catch(next);
+});
 
 router.post("/test", (req, res) => {
     discordRepository.getUser()
