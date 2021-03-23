@@ -38,9 +38,26 @@ async function removeGameFromBlackList(userId, gameId) {
     return true;
 }
 
+async function resetBlacklist(userId) {
+    if(userId == null) {
+        throw new AppError(400, "Bad request");
+    }
+
+    // Make sure the user exists
+    if(await userRepository.getUserFromId(userId) == null) {
+        throw new AppError(404, "User not found.");
+    }
+
+    // Reset blacklist
+    await userGamesRepository.resetBlacklist(userId);
+    return true;
+}
+
+
 
 
 module.exports = {
     addGameToBlackList,
-    removeGameFromBlackList
+    removeGameFromBlackList,
+    resetBlacklist
 };

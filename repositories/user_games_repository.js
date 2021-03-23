@@ -155,7 +155,7 @@ function removeGameFromBlackList(userId, gameId) {
 }
 
 
-function resetBlacklist(userId, gameId) {
+function resetBlacklist(userId) {
   return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
@@ -167,7 +167,7 @@ function resetBlacklist(userId, gameId) {
             else {
                 let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
 
-                connection.query(sql, [userId, gameId], (err, result) => {
+                connection.query(sql, [userId], (err, result) => {
                     connection.end();
                     if(err){
                         reject(err);
