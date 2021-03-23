@@ -2,6 +2,7 @@
 
 const config = require('./config');
 
+const userController = require("./controllers/user_controller");
 const user_games_repo = require("./repositories/user_games_repository");
 const user_repo = require("./repositories/user_repository");
 
@@ -29,6 +30,18 @@ function errorHandler(err, req, res, next) {
 const router = express.Router();
 app.use('/api', router);
 
+router.post("/users/register", (req, res) => {
+    let body = req.body;
+    let username = body.username;
+    let description = body.description;
+    let accessToken = body.access_token;
+    let refreshToken = body.refresh_token;
+
+    userController.registerUser(username, description, accessToken, refreshToken)
+    .then(result => res.status(200).json(result))
+    .catch(err => console.log(err));
+});
+
 router.post("/users/game", (req, res) => {
     let body = req.body;
     let user_id = body.user_id;
@@ -46,6 +59,7 @@ router.post("/users/game", (req, res) => {
 
 });
 
+<<<<<<< HEAD
 
 router.post("/users/blacklist/:game_id", (req, res) => {
     let parms = req.params;
@@ -62,6 +76,12 @@ router.post("/users/blacklist/:game_id", (req, res) => {
         }
     });
 
+=======
+router.post("/test", (req, res) => {
+    discordRepository.getUser()
+    .then(user => res.status(200).json(user))
+    .catch(err => console.log(err));
+>>>>>>> 81ce8951b5676bb442cd7478cb29f19a322c4a27
 });
 
 const server = http.createServer(app);

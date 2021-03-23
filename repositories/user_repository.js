@@ -11,46 +11,49 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(user_id ,username, description, last_login ,cb) {
+function addUser(user_id ,username, description) {
+  return new Promise((resolve, reject) => {
   let connection =  mysql.createConnection(config.db);
-  connection.connect( (error)=>{
-      if(error){
-          cb(error);
-      }
-      else {
-          console.log("Connected to DB");
-          let sql = "INSERT into users(user_id ,username, description, last_login) VALUES(?,?,?,?)";
-          connection.query(sql, [user_id,username, description, last_login], (err) =>{
-              if(err){
-                  cb(err);
-              }
-              else {
-                  // The callback method should be like X(errors, succeeded)
-                  cb(err, true);
-              }
-          })
-      }
-  });
+        connection.connect( (error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
+                connection.query(sql, [user_id,username, description], (err) =>{
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
+    });
 }
 
-function getUserFromId(user_id, cb) {
-    let connection = mysql.createConnection(config.db);
-    connection.connect((error)=>{
-        if(error){
-            cb(error);
-        }
-        else {
-            console.log("Connected to DB");
-            let sql = "SELECT * from users where user_id = ?";
-            connection.query(sql, [user_id], (err, data) => {
-                if(err){
-                    cb(err);
-                }
-                else {
-                    cb(err, data.map(dataToUser));
-                }
-            })
-        }
+function getUserFromId(user_id) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "SELECT * from users where user_id = ?";
+                connection.query(sql, [user_id], (err, data) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(data.map(dataToUser));
+                    }
+                })
+            }
+        });
     });
 }
 
