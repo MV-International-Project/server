@@ -16,7 +16,6 @@
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "mysql": "^2.18.1",
-    "node-fetch": "^2.6.1",
-    "refresh-fetch": "^0.7.0"
+    "node-fetch": "^2.6.1"
   }
 }
