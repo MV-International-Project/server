@@ -115,11 +115,10 @@ router.patch("/users/description", (req, res, next) => {
         .catch(next);
 });
 
-router.post("/users/blacklist/:game_id", (req, res, next) => {
+router.post("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
     let params = req.params;
     let gameId = params.game_id;
-    // TEMP user id
-    let userId = 1;
+    let user_id = req.user_id;
 
     userGamesController.addGameToBlackList(userId, gameId)
         .then(result => res.status(200).json(result))
