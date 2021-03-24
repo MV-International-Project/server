@@ -136,7 +136,7 @@ router.patch("/users/matchSuggestion/:user_id", (req, res, next) => {
     let body = req.body;
     let accepted = body.accept;
     // TEMP user id
-    let userId = 1;
+    let userId = 3;
 
     userGamesController.respondToMatchSuggestion(userId, suggestedUserId, accepted)
         .then(result => res.status(200).json(result))

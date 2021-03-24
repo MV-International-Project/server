@@ -398,5 +398,6 @@ module.exports = {
     newMatch,
     resetBlacklist,
     removeGameFromUser,
-    rejectPendingMatch
+    rejectPendingMatch,
+    checkCurrentMatches
 };

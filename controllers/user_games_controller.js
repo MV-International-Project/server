@@ -45,12 +45,12 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     }
 
     // Make sure the user exists
-    if(await userRepository.getUserFromId(userId) == null || userRepository.getUserFromId(suggestedUserId) == null) {
+    if(await userRepository.getUserFromId(userId) == null || await userRepository.getUserFromId(suggestedUserId) == null) {
         throw new AppError(404, "User not found.");
     }
 
-     // Make sure the user doesnt accept themself
-    if(await userRepository.getUserFromId(userId) == userRepository.getUserFromId(suggestedUserId)) {
+     // Make sure the user doesnt match themself
+    if(userId == suggestedUserId) {
         throw new AppError(409, "You cannot match with yourself!");
     }
 
