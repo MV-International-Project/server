@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `matches`;
 CREATE TABLE `matches` (
   `first_user` varchar(25) NOT NULL,
   `second_user` varchar(25) NOT NULL,
-  `matched_at` datetime DEFAULT NULL,
+  `matched_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`first_user`,`second_user`),
   KEY `FK_secondUser_matching` (`second_user`),
   CONSTRAINT `FK_firstUser_matching` FOREIGN KEY (`first_user`) REFERENCES `users` (`user_id`),
@@ -91,7 +91,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `user_id` varchar(25) NOT NULL,
   `username` varchar(30) NOT NULL,
-  `description` varchar(100) NOT NULL,
+  `description` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `last_login` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

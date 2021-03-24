@@ -116,6 +116,7 @@ async function mapUserObject(user, discordUser) {
 module.exports = {
     handleLogin,
     getUserInformation,
-    changeDescription
+    changeDescription,
+    mapUserObject
 };
 
