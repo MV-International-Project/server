@@ -55,9 +55,30 @@ async function resetBlacklist(userId) {
 
 
 
+async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
+    if(uid == null || gid == null){
+        throw new AppError(400, "Bad request");
+    }
+    if(await userRepository.getUserFromId(uid) == null) {
+        throw new AppError(404, "User not found.");
+    }
+    return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
+}
+
+async function removeGameFromUser(uid, gid){
+    if(uid == null || gid == null){
+        throw new AppError(400, "Bad request");
+    }
+    if(await userRepository.getUserFromId(uid) == null) {
+        throw new AppError(404, "User not found.");
+    }
+    return await userGamesRepository.removeGameFromUser(uid, gid);
+}
 
 module.exports = {
     addGameToBlackList,
     removeGameFromBlackList,
     resetBlacklist
+    connectGameToUser,
+    removeGameFromUser
 };

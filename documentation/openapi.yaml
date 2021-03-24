@@ -22,31 +22,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
-  /users/register:
-    post:
-      description: "Register an account."
-      tags:
-        - "User"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  $ref: "#/components/schemas/username"
-                description:
-                  $ref: "#/components/schemas/description"
-                access_token:
-                  $ref: "#/components/schemas/access_token"
-                refresh_token:
-                  $ref: "#/components/schemas/refresh_token"
-      responses:
-        '200':
-          description: "OK, registered user."
-        '400':
-          description: "Bad request"
   /users/{id}/registered:
     get:
       description: "API call to check if a certain ID is registered or not"
@@ -180,11 +155,17 @@ paths:
                 $ref: "#/components/schemas/MatchedUser"
         '404':
           description: "Match not found."
-  /users/game:
+  /users/games/{id}:
     post:
       description: "Add a game to the user's games."
       tags:
         - "User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
       requestBody:
         required: true
         content:
@@ -192,8 +173,6 @@ paths:
             schema:
               type: object
               properties:
-                game_id:
-                  type: integer
                 hours_played:
                   type: integer
                 rank:
@@ -201,6 +180,19 @@ paths:
       responses:
         '200':
           description: "OK, added game to the user"
+    delete:
+      description: "Remove a game from the user's games."
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: "OK, deleted game from the user's games."
   /users/blacklist/{game_id}:
     post:
       description: "Add a game to the user's blacklist."
