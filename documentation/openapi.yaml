@@ -98,7 +98,7 @@ paths:
           description: "OK"
   /users/matches:
     get:
-      description: "Retrieve the names and profile pictures of all your users."
+      description: "Retrieve the names and profile pictures of all your user's matches."
       tags:
         - "User"
       responses:

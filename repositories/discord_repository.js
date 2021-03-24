@@ -45,7 +45,6 @@ function refreshAccessToken() {
     })
     .then(res => res.json())
     .then(newToken => {
-        console.log(newToken);
         return resolve(true);
     })
     .catch(err => reject(err));

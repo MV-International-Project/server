@@ -145,6 +145,13 @@ router.delete("/users/blacklist", authenticateJWT, (req, res, next) => {
     .catch(next);
 });
 
+router.get("/users/matches", authenticateJWT, (req,res, next) => {
+    let userId = req.user_id;
+    matchController.getAllMatches(userId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
 router.get("/games/:game_id", (req, res, next) => {
     let gameId = req.params.game_id;
     gameController.getGameById(gameId).then(result => res.status(200).json(result))
@@ -174,7 +181,6 @@ router.patch("/users/matchSuggestion/:user_id", authenticateJWT, (req, res, next
 router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
     let currentUserId = req.user_id;
     let matchedUserId = req.params.user_id;
-    console.log(currentUserId, matchedUserId);
     matchController.getInfoOfMatchedUser(currentUserId, matchedUserId)
         .then(result => res.status(200).json(result))
         .catch(next);
