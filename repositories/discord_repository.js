@@ -4,6 +4,22 @@ const config = require("../config");
 const fetch = require('node-fetch');
 const ENDPOINT = "https://discord.com/api/v8";
 
+async function getAccessToken(code) {
+    return new Promise((resolve, reject) => {
+        fetch(`${ENDPOINT}/oauth2/token`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=authorization_code&code=${code}\&
+        scope=identify%20connections%20gdm.join&redirect_uri=http://127.0.0.1:8888/api/users/login`})
+        .then(res => res.json())
+        .then(token => {
+            resolve(token);
+        });
+    });
+}
+
 function fetchWithAccessToken(url, token, options = {}) {
     let optionsWithToken = options;
     if(token != null) {
@@ -51,5 +67,6 @@ function getUser(accessToken) {
 }
 
 module.exports = {
+    getAccessToken,
     getUser
 }

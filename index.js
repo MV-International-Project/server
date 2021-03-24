@@ -76,14 +76,15 @@ router.get("/user", authenticateJWT, (req, res, next) => {
     }).catch(next);
 });
 
-router.post("/users/login", (req, res, next) => {
-    let body = req.body;
-    let accessToken = body.access_token;
-    let refreshToken = body.refresh_token;
+router.get("/users/login", (req, res, next) => {
+    let code = req.query.code;
 
-    userController.loginUser(accessToken, refreshToken)
-        .then(result => res.status(200).json(result))
-        .catch(next);
+    userController.handleLogin(code)
+        .then(result => {
+            res.status(200)
+            .cookie("authToken", result, {httpOnly: true, maxAge: 604800000})
+            .redirect(config.clientPath);
+        }).catch(next);
 });
 
 router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {

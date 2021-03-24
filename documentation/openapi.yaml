@@ -24,7 +24,7 @@ paths:
                 $ref: "#/components/schemas/MatchedUser"
   /users/login:
     post:
-      description: "API call to login."
+      description: "API call to login using your discord auth code."
       tags:
         - "User"
       requestBody:
@@ -34,10 +34,8 @@ paths:
             schema:
               type: object
               properties:
-                access_token:
-                  $ref: "#/components/schemas/access_token"
-                refresh_token:
-                  $ref: "#/components/schemas/refresh_token"
+                code:
+                  type: string
       responses:
         '200':
           description: "OK, logged in user."

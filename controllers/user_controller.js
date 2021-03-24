@@ -8,7 +8,12 @@ const userRepository = require("../repositories/user_repository");
 const userGamesController = require("./user_games_controller");
 const jwt = require('jsonwebtoken');
 
-async function handleLogin(accessToken, refreshToken) {
+async function handleLogin(code) {
+
+    const tokens = await discordRepository.getAccessToken(code);
+    const accessToken = tokens.access_token;
+    const refreshToken = tokens.refresh_token;
+
     // Get user ID and user using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
@@ -46,7 +51,7 @@ async function registerUser(username, description, accessToken, refreshToken) {
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
-    return {token: userToken};
+    return userToken;
 }
 
 async function loginUser(accessToken, refreshToken) {
@@ -63,7 +68,7 @@ async function loginUser(accessToken, refreshToken) {
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
 
-    return {token: userToken};
+    return userToken;
 }
 
 async function getUserInformation(userId) {
