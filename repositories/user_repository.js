@@ -76,7 +76,11 @@ function getUserFromId(userId) {
                         reject(err);
                     }
                     else {
-                        if(data.length === 0) resolve(null);
+                        if(data.length == 0) {
+                          resolve(null);
+                          return;
+                        } 
+
                         resolve(dataToUser(data[0]));
                     }
                 })

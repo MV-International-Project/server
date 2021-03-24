@@ -22,24 +22,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
-  /users/{id}/registered:
-    get:
-      description: "API call to check if a certain ID is registered or not"
-      tags:
-        - "User"
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            $ref: "#/components/schemas/user_id"
-      responses:
-        '200':
-          description: "Boolean to show if the user is registered or not."
-          content:
-            application/json:
-              schema:
-                type: boolean
   /users/login:
     post:
       description: "API call to login."
@@ -93,7 +75,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  /users/matchSuggestion/{id}:
+  /users/matchSuggestion/{user_id}:
     patch:
       description: "API call to indicate whether you accept or reject a user."
       tags:
