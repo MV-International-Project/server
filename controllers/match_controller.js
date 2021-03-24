@@ -6,8 +6,8 @@ const userController = require('../controllers/user_controller');
 const userGamesController = require("../controllers/user_games_controller");
 const { AppError } = require('../errors');
 
-async function getMatchSuggestion(uid) {
-    const potentialMatchId = await matchRepository.getMatchSuggestion(uid);
+async function getMatchSuggestion(uid, whitelist) {
+    const potentialMatchId = await matchRepository.getMatchSuggestion(uid, whitelist);
 
     if(potentialMatchId === null) {
         throw new AppError(404, "No potential matches found.");

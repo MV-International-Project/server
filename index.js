@@ -137,7 +137,6 @@ router.delete("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => 
         .catch(next);
 });
 
-
 router.delete("/users/blacklist", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
 
@@ -153,7 +152,9 @@ router.get("/games/:game_id", (req, res, next) => {
 });
 
 router.get("/users/matchSuggestion", authenticateJWT, (req, res, next) => {
-    matchController.getMatchSuggestion(req.user_id)
+    const whitelist = req.query.games;
+
+    matchController.getMatchSuggestion(req.user_id, whitelist)
     .then(potentialMatch => res.status(200).json(potentialMatch))
     .catch(next);
 });
