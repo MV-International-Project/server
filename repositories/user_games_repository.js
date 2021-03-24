@@ -181,8 +181,10 @@ function removeGameFromBlackList(userId, gameId) {
 }
 
 
+
 function checkPendingMatches(userId, suggestedUserId) {
-  return new Promise((resolve, reject) => {
+
+    return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
 
@@ -203,6 +205,36 @@ function checkPendingMatches(userId, suggestedUserId) {
                             resolve(true);
                         }
                         resolve(false);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
+function resetBlacklist(userId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
+
+                connection.query(sql, [userId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                      if (result.affectedRows == 0) {
+                          reject("There are no games on your blacklist!")
+                      }
+                        resolve(true);
                     }
                 })
             }
@@ -292,11 +324,9 @@ function newMatch(userId, suggestedUserId) {
                 resolve(true);
             });
         });
-
-
-
-  });
+    });
 }
+
 
 module.exports = {
     connectGameToUser,
@@ -307,5 +337,7 @@ module.exports = {
     acceptMatchSuggestion,
     removeGameFromUser,
     checkPendingMatches,
-    newMatch
+    newMatch,
+    resetBlacklist,
+    removeGameFromUser
 };
