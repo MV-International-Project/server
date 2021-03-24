@@ -5,7 +5,7 @@ const config = require('./config');
 const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");
 const userGamesController = require("./controllers/user_games_controller");
-const gameRepository = require("./repositories/game_repository");
+const gameController = require("./controllers/game_controller");
 
 const http = require("http");
 const express = require("express");
@@ -134,9 +134,9 @@ router.delete("/users/blacklist", (req, res, next) => {
     .catch(next);
 });
 
-router.get("/games", (req, res, next) => {
-    let search = req.query.search;
-    gameRepository.getGame(3498).then(result => res.status(200).json(result))
+router.get("/games/:game_id", (req, res, next) => {
+    let gameId = req.params.game_id;
+    gameController.getGameById(gameId).then(result => res.status(200).json(result))
     .catch(next);
 });
 
