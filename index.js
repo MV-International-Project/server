@@ -133,6 +133,14 @@ router.delete("/users/blacklist", (req, res, next) => {
     .catch(next);
 });
 
+router.get("/users/matches", authenticateJWT, (req,res, next) => {
+    let userId = req.user_id;
+    console.log(userId);
+    matchController.getAllMatches(userId)
+        .then(result => res.status(200).json(result))
+        .catch(next);
+});
+
 router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
 
    let currentUserId = req.user_id;

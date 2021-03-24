@@ -6,6 +6,9 @@ const userController = require('../controllers/user_controller');
 const { AppError } = require('../errors');
 
 async function getInfoOfMatchedUser(uid, matchedId) {
+    if(uid == null || matchedId || null){
+        throw new AppError(400, "Bad Request");
+    }
     const currentUser = await userRepository.getUserFromId(uid);
     const matchedUser = await userRepository.getUserFromId(matchedId);
 
@@ -19,10 +22,25 @@ async function getInfoOfMatchedUser(uid, matchedId) {
         throw new AppError(404, "No match was found between these users.");
     }
 
-
     return userController.mapUserObject(matchedUser, discordUser);
 }
 
+async function getAllMatches(uid){
+    if(uid == null){
+        throw new AppError(400, "Bad Request");
+    }
+    const user = await userRepository.getUserFromId(uid);
+    if(user == null){
+        throw new AppError(404, "User not found");
+    }
+    const matches = await matchRespository.getAllMatches(uid);
+    if(matches == null){
+        throw new AppError(404, "No matches found for this user.")
+    }
+    return matches;
+}
+
 module.exports = {
-    getInfoOfMatchedUser
+    getInfoOfMatchedUser,
+    getAllMatches
 };

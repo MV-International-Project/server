@@ -11,6 +11,15 @@ function dataToMatch(data) {
     return match
 }
 
+function dataToPendingMatch(data) {
+    const match = {
+        first_user: data.first_user,
+        second_user: data.second_user,
+        accepted: true
+    };
+    return match;
+}
+
 function getMatch(firstUid, secondUid) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
@@ -39,17 +48,17 @@ function getAllMatches(uid){
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
             if(err){
-                reject(err);
+                reject(null);
             }
             else {
-                let sql = "SELECT * from pending_matches where first_user = ? or second_user = ?";
+                let sql = "SELECT * from pending_matches where (first_user = ? or second_user = ?) and accepted = true";
                 connection.query(sql, [uid, uid], (error, data) => {
                     connection.end();
                     if(error){
-                        reject(error);
+                        reject(null);
                     }
                     else {
-                        resolve(error, data.map(dataToMatch));
+                        resolve(error, data.map(dataToPendingMatch));
                     }
                 })
             }

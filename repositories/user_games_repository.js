@@ -217,6 +217,6 @@ module.exports = {
     getAllUsersFromGame,
     addGameToBlackList,
     removeGameFromBlackList,
-    resetBlacklist
+    resetBlacklist,
     removeGameFromUser
 };
