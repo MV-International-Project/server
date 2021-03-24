@@ -154,6 +154,12 @@ router.get("/games/:game_id", (req, res, next) => {
     .catch(next);
 });
 
+router.get("/users/matchSuggestion", authenticateJWT, (req, res, next) => {
+    matchController.getMatchSuggestion(req.user_id)
+    .then(potentialMatch => res.status(200).json(potentialMatch))
+    .catch(next);
+});
+
 router.patch("/users/matchSuggestion/:user_id", (req, res, next) => {
     let suggestedUserId = req.params.user_id;
     let body = req.body;

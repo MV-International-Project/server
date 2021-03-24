@@ -78,10 +78,7 @@ async function getUserInformation(userId) {
         throw new AppError(404, "Authenticated user not found.");
     }
 
-    const discordTokens = await userRepository.getTokens(userId);
-    const discordUser = await discordRepository.getUser(discordTokens.accessToken);
-
-    return mapUserObject(user, discordUser);
+    return mapUserObject(user, getDiscordUser(userId));
 }
 
 async function changeDescription(uid, description){
@@ -97,6 +94,11 @@ async function changeDescription(uid, description){
     }
 
     return await userRepository.changeDescription(uid, description);
+}
+
+async function getDiscordUser(userId) {
+    const discordTokens = await userRepository.getTokens(userId);
+    return await discordRepository.getUser(discordTokens.accessToken);
 }
 
 function getDiscordTag(discordUser) {
@@ -121,6 +123,8 @@ async function mapUserObject(user, discordUser) {
 module.exports = {
     handleLogin,
     getUserInformation,
+    getDiscordUser,
+    getAvatarPath,
     changeDescription,
     mapUserObject
 };
