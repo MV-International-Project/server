@@ -122,7 +122,16 @@ router.delete("/users/blacklist/:game_id", (req, res, next) => {
     userGamesController.removeGameFromBlackList(userId, gameId)
         .then(result => res.status(200).json(result))
         .catch(next);
+});
 
+
+router.delete("/users/blacklist", (req, res, next) => {
+    // TEMP user id
+    let userId = 1;
+
+    userGamesController.resetBlacklist(userId)
+    .then(result => res.status(200).json(result))
+    .catch(next);
 });
 
 router.get("/games", (req, res, next) => {
