@@ -270,6 +270,32 @@ function acceptMatchSuggestion(userId, suggestedUserId) {
   });
 }
 
+function rejectPendingMatch(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 0)";
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
 
 function newMatch(userId, suggestedUserId) {
   return new Promise((resolve, reject) => {
