@@ -49,7 +49,8 @@ function getMatchSuggestion(userId) {
                 AND NOT EXISTS (SELECT * FROM pending_matches WHERE first_user = ? AND second_user = users.user_id)
                 AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
                 GROUP BY users.user_id
-                ORDER BY commongames DESC`;
+                ORDER BY commongames DESC
+                LIMIT 1;`;
                 connection.query(sql, Array(5).fill(userId), (error, data) => {
                     if(error){
                         reject(error);
