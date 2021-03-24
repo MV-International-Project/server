@@ -1,12 +1,16 @@
 "use strict";
 
 const { AppError } = require('../errors');
-const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
 const userGamesRepository = require("../repositories/user_games_repository");
 const gameRepository = require("../repositories/game_repository");
 
-
+async function getGamesFromUser(userId) {
+    let gameIds = await userGamesRepository.getAllGamesFromUser(userId);
+    gameIds = gameIds.map(obj => obj.game_id);
+    let games = await Promise.all(gameIds.map(async id => gameRepository.getGame(id)));
+    return games;
+}
 
 async function addGameToBlackList(userId, gameId) {
     if(userId == null || gameId == null) {
@@ -85,6 +89,7 @@ module.exports = {
     addGameToBlackList,
     removeGameFromBlackList,
     resetBlacklist,
+    getGamesFromUser,
     connectGameToUser,
     removeGameFromUser
 };

@@ -5,9 +5,6 @@ const user_repo = require("./user_repository");
 function dataToGames(data) {
     const game = {
         game_id: data.game_id,
-        //TODO: remove name & image link after game API integrates.
-        name: "Testgame",
-        image_link: "Fakelink"
     };
     return game;
     // getGameByID(); TODO: Wait for games API to be integrated to get the game info from that API.
@@ -86,7 +83,7 @@ function getAllGamesFromUser(uid) {
                     if (error) {
                         reject(error);
                     } else {
-                        resolve(error, data.map(dataToGames));
+                        resolve(data.map(dataToGames));
                     }
                 });
             }
