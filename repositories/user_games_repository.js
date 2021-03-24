@@ -193,7 +193,8 @@ function resetBlacklist(userId) {
                     }
                     else {
                       if (result.affectedRows == 0) {
-                          reject("There are no games on your blacklist!")
+                          reject("There are no games on your blacklist!");
+                          return;
                       }
                         resolve(true);
                     }
@@ -204,12 +205,197 @@ function resetBlacklist(userId) {
 }
 
 
+
+function checkPendingMatches(userId, suggestedUserId) {
+
+    return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = `SELECT accepted FROM pending_matches WHERE first_user = ? AND second_user = ? AND accepted = 1`;
+
+                connection.query(sql, [suggestedUserId, userId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        if (result.length > 0) {
+                            resolve(true);
+                            return;
+                        }
+                        resolve(false);
+                    }
+                })
+            }
+        });
+  });
+}
+
+function checkCurrentMatches(userId, suggestedUserId) {
+
+    return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = `SELECT matched_at FROM matches WHERE first_user = ? AND second_user = ? OR first_user = ? AND second_user = ?`;
+
+                connection.query(sql, [suggestedUserId, userId, userId, suggestedUserId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        if (result.length > 0) {
+                            resolve(true);
+                            return;
+                        }
+                        resolve(false);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
+
+
+
+function acceptMatchSuggestion(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 1)";
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
+function rejectPendingMatch(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 0)";
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
+function newMatch(userId, suggestedUserId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+     connection.beginTransaction(function(error) {
+
+            if(error){
+                reject(error);
+                connection.end();
+            }
+            else {
+                let sql = `INSERT INTO matches(first_user, second_user) VALUES(?, ?);`;
+
+                connection.query(sql, [userId, suggestedUserId], (err, result) => {
+                    
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                });
+
+
+                sql = `DELETE FROM pending_matches WHERE first_user = ? AND second_user = ?;`;
+
+                connection.query(sql, [suggestedUserId, userId], (err, result) => {
+                    
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                        resolve(true);
+                    }
+                })
+
+            }
+
+            
+            // Commit transaction if previous queries were succesful
+            connection.commit(error => {
+                if(error) {
+                    connection.rollback(() => {
+                        reject(error);
+                        connection.end();  
+                        return;
+                    });
+                }
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
     getAllUsersFromGame,
     addGameToBlackList,
     removeGameFromBlackList,
+    acceptMatchSuggestion,
+    removeGameFromUser,
+    checkPendingMatches,
+    newMatch,
     resetBlacklist,
-    removeGameFromUser
+    removeGameFromUser,
+    rejectPendingMatch,
+    checkCurrentMatches
 };

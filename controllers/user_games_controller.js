@@ -43,12 +43,44 @@ async function removeGameFromBlackList(userId, gameId) {
     return true;
 }
 
-async function resetBlacklist(userId) {
-    if(userId == null) {
+
+async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
+    if(userId == null || suggestedUserId == null || accepted == null) {
         throw new AppError(400, "Bad request");
     }
 
     // Make sure the user exists
+    if(await userRepository.getUserFromId(userId) == null || await userRepository.getUserFromId(suggestedUserId) == null) {
+        throw new AppError(404, "User not found.");
+    }
+
+     // Make sure the user doesnt match themself
+    if(userId == suggestedUserId) {
+        throw new AppError(409, "You cannot match with yourself!");
+    }
+
+    if (await userGamesRepository.checkCurrentMatches(userId, suggestedUserId)) {
+            throw new AppError(409, "You are already matched with this person!");
+    }
+
+    // Accept match
+    if (accepted) {
+        if (await userGamesRepository.checkPendingMatches(userId, suggestedUserId)) {
+            await userGamesRepository.newMatch(userId, suggestedUserId);
+        } else {
+            await userGamesRepository.acceptMatchSuggestion(userId, suggestedUserId);
+        }
+    } else {
+        await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
+    }
+    return true;
+}
+
+async function resetBlacklist(userId) {
+    if(userId == null) {
+        throw new AppError(400, "Bad request");
+    }
+    
     if(await userRepository.getUserFromId(userId) == null) {
         throw new AppError(404, "User not found.");
     }
@@ -64,7 +96,7 @@ async function hasGame(uid, gid) {
     return userGames.includes(parseInt(gid));
 }
 
-async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
+async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null) {
     if(uid == null || gid == null){
         throw new AppError(400, "Bad request");
     }
@@ -83,7 +115,7 @@ async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
     return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
 }
 
-async function removeGameFromUser(uid, gid){
+async function removeGameFromUser(uid, gid) {
     if(uid == null || gid == null){
         throw new AppError(400, "Bad request");
     }
@@ -96,6 +128,7 @@ async function removeGameFromUser(uid, gid){
     }
 
     return await userGamesRepository.removeGameFromUser(uid, gid);
+
 }
 
 module.exports = {
@@ -104,5 +137,6 @@ module.exports = {
     resetBlacklist,
     getGamesFromUser,
     connectGameToUser,
-    removeGameFromUser
+    removeGameFromUser,
+    respondToMatchSuggestion
 };
