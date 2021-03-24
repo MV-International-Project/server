@@ -114,8 +114,8 @@ async function mapUserObject(user, discordUser) {
         avatar_path: getAvatarPath(discordUser),
         description: user.description,
         games: await userGamesController.getGamesFromUser(user.user_id),
-        discord_tag: getDiscordTag(discordUser)
-    }
+        discord_tag: getDiscordTag(discordUser) + ".jpg"
+    };
 }
 
 module.exports = {
