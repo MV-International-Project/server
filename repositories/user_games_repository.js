@@ -5,9 +5,6 @@ const user_repo = require("./user_repository");
 function dataToGames(data) {
     const game = {
         game_id: data.game_id,
-        //TODO: remove name & image link after game API integrates.
-        name: "Testgame",
-        image_link: "Fakelink"
     };
     return game;
     // getGameByID(); TODO: Wait for games API to be integrated to get the game info from that API.
@@ -38,14 +35,13 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
                 connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
                     connection.end();
                     if (error) {
                         reject(error);
                     } else {
-                        resolve();
+                        resolve(true);
                     }
                 })
             }
@@ -60,14 +56,13 @@ function removeGameFromUser(uid, gid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "DELETE from user_games where user_id = ? and game_id = ?";
                 connection.query(sql, [uid, gid], (error) =>{
                     connection.end();
                     if(error){
                         reject(error);
                     } else {
-                        resolve();
+                        resolve(true);
                     }
                 })
             }
@@ -82,14 +77,13 @@ function getAllGamesFromUser(uid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "SELECT game_id from user_games where user_id = ?";
                 connection.query(sql, [uid], (error, data) => {
                     connection.end();
                     if (error) {
                         reject(error);
                     } else {
-                        resolve(error, data.map(dataToGames));
+                        resolve(data.map(dataToGames));
                     }
                 });
             }
@@ -105,7 +99,6 @@ function getAllUsersFromGame(gid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "SELECT user_id from user_games where game_id = ?";
                 connection.query(sql, [gid], (error, data) => {
                     connection.end();

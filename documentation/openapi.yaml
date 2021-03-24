@@ -235,20 +235,24 @@ paths:
           description: "OK, modified description"
         '404':
           description: "User not found: unable to change description"
-  /games:
+  /games/{game_id}:
     get:
-      description: "Retrieve all games with their information."
+      description: "Retrieve a game with a specific ID"
       tags:
         - "Game"
+      parameters:
+        - in: path
+          name: game_id
+          schema:
+            type: integer
+          required: true
       responses:
         '200':
-          description: "OK, returns a list of all the games"
+          description: "OK, returns game info"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Game"
+                $ref: "#/components/schemas/Game"
 components:
   schemas:
     access_token:

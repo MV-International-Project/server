@@ -5,7 +5,7 @@ const config = require('../config');
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
-const userGamesRepository = require("../repositories/user_games_repository");
+const userGamesController = require("./user_games_controller");
 const jwt = require('jsonwebtoken');
 
 async function handleLogin(accessToken, refreshToken) {
@@ -102,13 +102,13 @@ function getAvatarPath(discordUser) {
     return `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
 }
 
-function mapUserObject(user, discordUser) {
+async function mapUserObject(user, discordUser) {
     return {
         id: user.user_id,
         username: user.username,
         avatar_path: getAvatarPath(discordUser),
         description: user.description,
-        games: [],
+        games: await userGamesController.getGamesFromUser(user.user_id),
         discord_tag: getDiscordTag(discordUser)
     }
 }
