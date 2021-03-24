@@ -73,7 +73,7 @@ router.get("/user", authenticateJWT, (req, res, next) => {
     }).catch(next);
 });
 
-router.post("/users/games/:id", authenticateJWT, (req, res, next) => {
+router.post("/users/games/:game_id", authenticateJWT, (req, res, next) => {
     let body = req.body;
     let user_id = req.user_id;
     let game_id = req.params.game_id;
@@ -84,7 +84,7 @@ router.post("/users/games/:id", authenticateJWT, (req, res, next) => {
         .catch(next);
 });
 
-router.delete("/users/games/:id", authenticateJWT, (req, res, next) => {
+router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
     let gameId = req.params.game_id;
     userGamesController.removeGameFromUser(userId, gameId)

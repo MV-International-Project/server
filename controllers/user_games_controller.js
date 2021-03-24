@@ -4,6 +4,7 @@ const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
 const userGamesRepository = require("../repositories/user_games_repository");
+const gameRepository = require("../repositories/game_repository");
 
 
 
@@ -62,6 +63,11 @@ async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
     if(await userRepository.getUserFromId(uid) == null) {
         throw new AppError(404, "User not found.");
     }
+    if(await gameRepository.getGame(gid) == null) {
+        // When the game doesn't exist in our database, try to add it
+        await gameRepository.addGame(gid);
+    }
+
     return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
 }
 
