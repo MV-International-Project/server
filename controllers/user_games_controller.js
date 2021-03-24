@@ -6,9 +6,7 @@ const userGamesRepository = require("../repositories/user_games_repository");
 const gameRepository = require("../repositories/game_repository");
 
 async function getGamesFromUser(userId) {
-    let gameIds = await userGamesRepository.getAllGamesFromUser(userId);
-    gameIds = gameIds.map(obj => obj.game_id);
-    let games = await Promise.all(gameIds.map(async id => gameRepository.getGame(id)));
+    const games = await userGamesRepository.getAllGamesFromUser(userId);
     return games;
 }
 
