@@ -49,15 +49,21 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
         throw new AppError(404, "User not found.");
     }
 
+     // Make sure the user doesnt accept themself
+    if(await userRepository.getUserFromId(userId) == userRepository.getUserFromId(suggestedUserId)) {
+        throw new AppError(409, "You cannot match with yourself!");
+    }
+
     // Accept match
     if (accepted) {
+       
         if (await userGamesRepository.checkPendingMatches(userId, suggestedUserId)) {
             await userGamesRepository.newMatch(userId, suggestedUserId);
         } else {
             await userGamesRepository.acceptMatchSuggestion(userId, suggestedUserId);
         }
     } else {
-        //await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
+        await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
     }
     return true;
 }

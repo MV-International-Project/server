@@ -181,6 +181,36 @@ function removeGameFromBlackList(userId, gameId) {
 }
 
 
+function resetBlacklist(userId) {
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.connect((error)=>{
+            if(error){
+                reject(error);
+            }
+            else {
+                let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
+
+                connection.query(sql, [userId], (err, result) => {
+                    connection.end();
+                    if(err){
+                        reject(err);
+                    }
+                    else {
+                      if (result.affectedRows == 0) {
+                          reject("There are no games on your blacklist!")
+                      }
+                        resolve(true);
+                    }
+                })
+            }
+        });
+  });
+}
+
+
 
 function checkPendingMatches(userId, suggestedUserId) {
 
@@ -212,9 +242,9 @@ function checkPendingMatches(userId, suggestedUserId) {
   });
 }
 
+function checkCurrentMatches(userId, suggestedUserId) {
 
-function resetBlacklist(userId) {
-  return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
     let connection = mysql.createConnection(config.db);
 
@@ -223,24 +253,26 @@ function resetBlacklist(userId) {
                 reject(error);
             }
             else {
-                let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
+                let sql = `SELECT matched_at FROM matches WHERE first_user = ? AND second_user = ? OR first_user = ? AND second_user = ?`;
 
-                connection.query(sql, [userId], (err, result) => {
+                connection.query(sql, [suggestedUserId, userId, userId, suggestedUserId], (err, result) => {
                     connection.end();
                     if(err){
                         reject(err);
                     }
                     else {
-                      if (result.affectedRows == 0) {
-                          reject("There are no games on your blacklist!")
-                      }
-                        resolve(true);
+                        if (result.length > 0) {
+                            resolve(true);
+                        }
+                        resolve(false);
                     }
                 })
             }
         });
   });
 }
+
+
 
 
 
@@ -365,5 +397,6 @@ module.exports = {
     checkPendingMatches,
     newMatch,
     resetBlacklist,
-    removeGameFromUser
+    removeGameFromUser,
+    rejectPendingMatch
 };
