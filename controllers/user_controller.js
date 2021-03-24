@@ -122,6 +122,8 @@ module.exports = {
     handleLogin,
     getUserInformation,
     changeDescription,
-    mapUserObject
+    mapUserObject,
+    getAvatarPath,
+    getDiscordTag
 };
 

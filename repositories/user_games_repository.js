@@ -396,7 +396,6 @@ module.exports = {
     addGameToBlackList,
     removeGameFromBlackList,
     acceptMatchSuggestion,
-    removeGameFromUser,
     checkPendingMatches,
     newMatch,
     resetBlacklist,
