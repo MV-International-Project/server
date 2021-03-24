@@ -12,7 +12,6 @@ function dataToMatch(data) {
 }
 
 function matchDataToUser(data) {
-    console.log(data);
     let match;
     if(data.first_user != null){
          match = {

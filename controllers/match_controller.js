@@ -38,11 +38,11 @@ async function getAllMatches(uid) {
     if (matches == null) {
         throw new AppError(404, "No matches found for this user.")
     }
-    let users = await Promise.all(matches.map(await pendingMatchToUser));
+    let users = await Promise.all(matches.map(await matchToUser));
     return users;
 }
 
-async function pendingMatchToUser(match){
+async function matchToUser(match){
     let user = await userRepository.getUserFromId(match.user);
     const discordTokens = await userRepository.getTokens(user.user_id);
     const discordUser = await discordRepository.getUser(discordTokens.accessToken);
