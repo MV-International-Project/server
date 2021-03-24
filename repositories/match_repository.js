@@ -21,6 +21,7 @@ function getMatch(firstUid, secondUid) {
             else {
                 let sql = "SELECT * from matches where first_user = ? and second_user = ?";
                 connection.query(sql, [firstUid, secondUid], (error, data) => {
+                    connection.end();
                     if(error){
                         reject(error);
                     }
@@ -33,6 +34,30 @@ function getMatch(firstUid, secondUid) {
     });
 }
 
+function getAllMatches(uid){
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((err) => {
+            if(err){
+                reject(err);
+            }
+            else {
+                let sql = "SELECT * from pending_matches where first_user = ? or second_user = ?";
+                connection.query(sql, [uid, uid], (error, data) => {
+                    connection.end();
+                    if(error){
+                        reject(error);
+                    }
+                    else {
+                        resolve(error, data.map(dataToMatch));
+                    }
+                })
+            }
+        })
+    })
+}
+
 module.exports = {
-    getMatch
+    getMatch,
+    getAllMatches
 };

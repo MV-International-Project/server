@@ -9,7 +9,6 @@ async function getInfoOfMatchedUser(uid, matchedId) {
     const currentUser = await userRepository.getUserFromId(uid);
     const matchedUser = await userRepository.getUserFromId(matchedId);
 
-    //TODO: Test with multiple users that are actually linked to discord.
     const discordTokens = await userRepository.getTokens(matchedId);
     const discordUser = await discordRepository.getUser(discordTokens.accessToken);
 
