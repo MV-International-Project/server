@@ -118,7 +118,7 @@ router.patch("/users/description", (req, res, next) => {
 router.post("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
     let params = req.params;
     let gameId = params.game_id;
-    let user_id = req.user_id;
+    let userId = req.user_id;
 
     userGamesController.addGameToBlackList(userId, gameId)
         .then(result => res.status(200).json(result))
@@ -126,11 +126,11 @@ router.post("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
 
 });
 
-router.delete("/users/blacklist/:game_id", (req, res, next) => {
+router.delete("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
     let params = req.params;
     let gameId = params.game_id;
-    // TEMP user id
-    let userId = 1;
+    let userId = req.user_id;
+
 
     userGamesController.removeGameFromBlackList(userId, gameId)
         .then(result => res.status(200).json(result))
@@ -138,9 +138,8 @@ router.delete("/users/blacklist/:game_id", (req, res, next) => {
 });
 
 
-router.delete("/users/blacklist", (req, res, next) => {
-    // TEMP user id
-    let userId = 1;
+router.delete("/users/blacklist", authenticateJWT, (req, res, next) => {
+    let userId = req.user_id;
 
     userGamesController.resetBlacklist(userId)
     .then(result => res.status(200).json(result))
@@ -153,12 +152,11 @@ router.get("/games/:game_id", (req, res, next) => {
     .catch(next);
 });
 
-router.patch("/users/matchSuggestion/:user_id", (req, res, next) => {
+router.patch("/users/matchSuggestion/:user_id", authenticateJWT, (req, res, next) => {
     let suggestedUserId = req.params.user_id;
     let body = req.body;
     let accepted = body.accept;
-    // TEMP user id
-    let userId = 1;
+    let userId = req.user_id;
 
     userGamesController.respondToMatchSuggestion(userId, suggestedUserId, accepted)
         .then(result => res.status(200).json(result))
