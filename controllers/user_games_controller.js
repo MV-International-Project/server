@@ -3,6 +3,7 @@
 const { AppError } = require('../errors');
 const userRepository = require("../repositories/user_repository");
 const userGamesRepository = require("../repositories/user_games_repository");
+const gameController = require("../controllers/game_controller");
 const gameRepository = require("../repositories/game_repository");
 
 async function getGamesFromUser(userId) {
@@ -20,6 +21,12 @@ async function addGameToBlackList(userId, gameId) {
         throw new AppError(404, "User not found.");
     }
 
+
+    // Make sure the game exists
+    if(await gameController.getGameById(gameId) == null) {
+        throw new AppError(404, "Game not found.");
+    }
+
     // Add game to blacklist
     await userGamesRepository.addGameToBlackList(userId, gameId);
     return true;
@@ -34,6 +41,11 @@ async function removeGameFromBlackList(userId, gameId) {
     // Make sure the user exists
     if(await userRepository.getUserFromId(userId) == null) {
         throw new AppError(404, "User not found.");
+    }
+
+    // Make sure the game exists
+    if(await gameController.getGameById(gameId) == null) {
+        throw new AppError(404, "Game not found.");
     }
 
     // Add game to blacklist
@@ -82,7 +94,6 @@ async function resetBlacklist(userId) {
     if(await userRepository.getUserFromId(userId) == null) {
         throw new AppError(404, "User not found.");
     }
-
     // Reset blacklist
     await userGamesRepository.resetBlacklist(userId);
     return true;
