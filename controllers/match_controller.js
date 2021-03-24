@@ -25,19 +25,31 @@ async function getInfoOfMatchedUser(uid, matchedId) {
     return userController.mapUserObject(matchedUser, discordUser);
 }
 
-async function getAllMatches(uid){
-    if(uid == null){
+async function getAllMatches(uid) {
+    if (uid == null) {
         throw new AppError(400, "Bad Request");
     }
     const user = await userRepository.getUserFromId(uid);
-    if(user == null){
+    if (user == null) {
         throw new AppError(404, "User not found");
     }
     const matches = await matchRespository.getAllMatches(uid);
-    if(matches == null){
+    if (matches == null) {
         throw new AppError(404, "No matches found for this user.")
     }
-    return matches;
+    console.log(matches, "yeet");
+    let users = await Promise.all(matches.map(await pendingMatchToUser));
+    return users;
+}
+
+async function pendingMatchToUser(match){
+    let user = await userRepository.getUserFromId(match.user);
+    const discordTokens = await userRepository.getTokens(user.user_id);
+    const discordUser = await discordRepository.getUser(discordTokens.accessToken);
+
+    let users =
+        await userController.mapUserObject(user, discordUser);
+    return users;
 }
 
 module.exports = {
