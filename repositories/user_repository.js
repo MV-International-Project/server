@@ -71,9 +71,11 @@ function getUserFromId(userId) {
                     connection.end();
                     if (err) {
                         reject(err);
-                    } else {
-                        if (data.length === 0) {
-                            resolve(null)
+                    }
+                    else {
+                        if(data.length == 0) {
+                          resolve(null);
+                          return;
                         }
                         resolve(dataToUser(data[0]));
                     }

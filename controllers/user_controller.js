@@ -5,10 +5,15 @@ const config = require('../config');
 const { AppError } = require('../errors');
 const discordRepository = require("../repositories/discord_repository");
 const userRepository = require("../repositories/user_repository");
-const userGamesRepository = require("../repositories/user_games_repository");
+const userGamesController = require("./user_games_controller");
 const jwt = require('jsonwebtoken');
 
-async function handleLogin(accessToken, refreshToken) {
+async function handleLogin(code) {
+
+    const tokens = await discordRepository.getAccessToken(code);
+    const accessToken = tokens.access_token;
+    const refreshToken = tokens.refresh_token;
+
     // Get user ID and user using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
@@ -46,7 +51,7 @@ async function registerUser(username, description, accessToken, refreshToken) {
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
-    return {token: userToken};
+    return userToken;
 }
 
 async function loginUser(accessToken, refreshToken) {
@@ -63,7 +68,7 @@ async function loginUser(accessToken, refreshToken) {
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
 
-    return {token: userToken};
+    return userToken;
 }
 
 async function getUserInformation(userId) {
@@ -102,13 +107,13 @@ function getAvatarPath(discordUser) {
     return `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
 }
 
-function mapUserObject(user, discordUser) {
+async function mapUserObject(user, discordUser) {
     return {
         id: user.user_id,
         username: user.username,
         avatar_path: getAvatarPath(discordUser),
         description: user.description,
-        games: [],
+        games: await userGamesController.getGamesFromUser(user.user_id),
         discord_tag: getDiscordTag(discordUser)
     }
 }
@@ -117,6 +122,8 @@ module.exports = {
     handleLogin,
     getUserInformation,
     changeDescription,
-    mapUserObject
+    mapUserObject,
+    getAvatarPath,
+    getDiscordTag
 };
 

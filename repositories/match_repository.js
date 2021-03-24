@@ -11,19 +11,19 @@ function dataToMatch(data) {
     return match
 }
 
-function dataToPendingMatch(data) {
+function matchDataToUser(data) {
     console.log(data);
     let match;
     if(data.first_user != null){
          match = {
             user: data.first_user,
-            accepted: true
+            matched_at: data.matched_at
         };
     }
     else {
          match = {
             user: data.second_user,
-            accepted: true
+            matched_at: data.matched_at
         };
     }
     return match;
@@ -34,14 +34,14 @@ function getMatch(firstUid, secondUid) {
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
             if(err){
-                reject(null);
+                reject(err);
             }
             else {
                 let sql = "SELECT * from matches where first_user = ? and second_user = ?";
                 connection.query(sql, [firstUid, secondUid], (error, data) => {
                     connection.end();
                     if(error){
-                        reject(null);
+                        reject(error);
                     }
                     else {
                         resolve(data.map(dataToMatch));
@@ -58,19 +58,18 @@ function getAllMatches(uid){
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
             if(err){
-                reject(null);
+                reject(err);
             }
             else {
-                let sql = "  SELECT second_user FROM pending_matches WHERE first_user = ? AND accepted = TRUE UNION SELECT" +
-                    " first_user FROM pending_matches WHERE second_user = ? AND accepted = TRUE";
+                let sql = "  SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
+                    " first_user, matched_at FROM matches WHERE second_user = ?";
                 connection.query(sql, [uid, uid], (error, data) => {
                     connection.end();
                     if(error){
-                        reject(null);
-                        return;
+                        reject(error);
                     }
                     else {
-                        resolve(data.map(dataToPendingMatch));
+                        resolve(data.map(matchDataToUser));
                     }
                 });
             }

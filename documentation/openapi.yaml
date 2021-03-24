@@ -22,27 +22,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
-  /users/{id}/registered:
-    get:
-      description: "API call to check if a certain ID is registered or not"
-      tags:
-        - "User"
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            $ref: "#/components/schemas/user_id"
-      responses:
-        '200':
-          description: "Boolean to show if the user is registered or not."
-          content:
-            application/json:
-              schema:
-                type: boolean
   /users/login:
     post:
-      description: "API call to login."
+      description: "API call to login using your discord auth code."
       tags:
         - "User"
       requestBody:
@@ -52,10 +34,8 @@ paths:
             schema:
               type: object
               properties:
-                access_token:
-                  $ref: "#/components/schemas/access_token"
-                refresh_token:
-                  $ref: "#/components/schemas/refresh_token"
+                code:
+                  type: string
       responses:
         '200':
           description: "OK, logged in user."
@@ -93,7 +73,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  /users/matchSuggestion/{id}:
+  /users/matchSuggestion/{user_id}:
     patch:
       description: "API call to indicate whether you accept or reject a user."
       tags:
@@ -253,20 +233,24 @@ paths:
           description: "OK, modified description"
         '404':
           description: "User not found: unable to change description"
-  /games:
+  /games/{game_id}:
     get:
-      description: "Retrieve all games with their information."
+      description: "Retrieve a game with a specific ID"
       tags:
         - "Game"
+      parameters:
+        - in: path
+          name: game_id
+          schema:
+            type: integer
+          required: true
       responses:
         '200':
-          description: "OK, returns a list of all the games"
+          description: "OK, returns game info"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Game"
+                $ref: "#/components/schemas/Game"
 components:
   schemas:
     access_token:
