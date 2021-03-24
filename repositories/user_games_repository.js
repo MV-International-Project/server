@@ -41,7 +41,7 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
                     if (error) {
                         reject(error);
                     } else {
-                        resolve();
+                        resolve(true);
                     }
                 })
             }
@@ -62,7 +62,7 @@ function removeGameFromUser(uid, gid) {
                     if(error){
                         reject(error);
                     } else {
-                        resolve();
+                        resolve(true);
                     }
                 })
             }
