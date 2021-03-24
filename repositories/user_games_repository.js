@@ -38,7 +38,6 @@ function connectGameToUser(uid, gid, hoursPlayed, rank) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
                 connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
                     connection.end();
@@ -60,7 +59,6 @@ function removeGameFromUser(uid, gid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "DELETE from user_games where user_id = ? and game_id = ?";
                 connection.query(sql, [uid, gid], (error) =>{
                     connection.end();
@@ -82,7 +80,6 @@ function getAllGamesFromUser(uid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "SELECT game_id from user_games where user_id = ?";
                 connection.query(sql, [uid], (error, data) => {
                     connection.end();
@@ -105,7 +102,6 @@ function getAllUsersFromGame(gid) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to DB");
                 let sql = "SELECT user_id from user_games where game_id = ?";
                 connection.query(sql, [gid], (error, data) => {
                     connection.end();
