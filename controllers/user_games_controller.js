@@ -58,7 +58,11 @@ async function resetBlacklist(userId) {
     return true;
 }
 
-
+async function hasGame(uid, gid) {
+    let userGames = await userGamesRepository.getAllGamesFromUser(uid);
+    userGames = userGames.map(game => game.game_id);
+    return userGames.includes(parseInt(gid));
+}
 
 async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
     if(uid == null || gid == null){
@@ -72,6 +76,10 @@ async function connectGameToUser(uid, gid, hoursPlayed=0, rank=null){
         await gameRepository.addGame(gid);
     }
 
+    if(await hasGame(uid, gid)) {
+        throw new AppError(400, "You already have this game.");
+    }
+
     return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
 }
 
@@ -82,6 +90,11 @@ async function removeGameFromUser(uid, gid){
     if(await userRepository.getUserFromId(uid) == null) {
         throw new AppError(404, "User not found.");
     }
+
+    if(!await hasGame(uid, gid)) {
+        throw new AppError(400, "You don't have this game");
+    }
+
     return await userGamesRepository.removeGameFromUser(uid, gid);
 }
 
