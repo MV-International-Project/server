@@ -54,11 +54,12 @@ function getAllMatches(uid){
                 let sql = "SELECT * from pending_matches where (first_user = ? or second_user = ?) and accepted = true";
                 connection.query(sql, [uid, uid], (error, data) => {
                     connection.end();
+                    console.log(data);
                     if(error){
                         reject(null);
                     }
                     else {
-                        resolve(error, data.map(dataToPendingMatch));
+                        resolve(data.map(dataToPendingMatch));
                     }
                 })
             }
