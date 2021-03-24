@@ -5,6 +5,8 @@ const user_repo = require("./user_repository");
 function dataToGames(data) {
     const game = {
         game_id: data.game_id,
+        name: data.name,
+        image: data.image_link
     };
     return game;
     // getGameByID(); TODO: Wait for games API to be integrated to get the game info from that API.
@@ -77,7 +79,10 @@ function getAllGamesFromUser(uid) {
             if (err) {
                 reject(err);
             } else {
-                let sql = "SELECT game_id from user_games where user_id = ?";
+                let sql = `SELECT games.game_id, games.name, games.image_link 
+                FROM user_games 
+                INNER JOIN games ON user_games.game_id = games.game_id
+                WHERE user_id = ?`;
                 connection.query(sql, [uid], (error, data) => {
                     connection.end();
                     if (error) {
