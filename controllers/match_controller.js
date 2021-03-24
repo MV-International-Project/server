@@ -46,6 +46,20 @@ async function pendingMatchToUser(match){
     let user = await userRepository.getUserFromId(match.user);
     const discordTokens = await userRepository.getTokens(user.user_id);
     const discordUser = await discordRepository.getUser(discordTokens.accessToken);
+    let date = match.matched_at.toLocaleDateString().toString().split("/");
+    console.log(date);
+    let year = date[2];
+    let month = date[1];
+    if(month.length === 1){
+        month = "0" + month
+    }
+    let day = date[0];
+    if(day.length === 1){
+        day = "0"+ day;
+    }
+    let time = match.matched_at.toTimeString().toString().split(" ")[0];
+
+    let matched_at = "" + year + "-" + month + "-" + day + " " + time;
     return {
         id: user.user_id,
         username: user.username,
@@ -53,7 +67,7 @@ async function pendingMatchToUser(match){
         description: user.description,
         games: await userGamesController.getGamesFromUser(user.user_id),
         discord_tag: userController.getDiscordTag(discordUser),
-        matched_at: match.matched_at
+        matched_at: matched_at
     }}
 
 module.exports = {
