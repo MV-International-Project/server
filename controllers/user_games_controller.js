@@ -56,7 +56,9 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
 
     // Accept match
     if (accepted) {
-       
+        if (await userGamesRepository.checkCurrentMatches(userId, suggestedUserId)) {
+            throw new AppError(409, "You are already matched with this person!");
+        }
         if (await userGamesRepository.checkPendingMatches(userId, suggestedUserId)) {
             await userGamesRepository.newMatch(userId, suggestedUserId);
         } else {
