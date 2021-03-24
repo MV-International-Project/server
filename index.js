@@ -89,6 +89,7 @@ router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
     let gameId = req.params.game_id;
     userGamesController.removeGameFromUser(userId, gameId)
+    .catch(next);
 });
 
 router.post("/users/games/:game_id", authenticateJWT, (req, res, next) => {
