@@ -6,6 +6,33 @@ const { AppError } = require("../errors");
 const config = require("../config");
 const ENDPOINT = "https://api.rawg.io/api";
 
+function mapRowToGame(row) {
+    return {
+        name: row.name,
+        image: row.image_link
+    }
+}
+
+function getGame(gameId) {
+    let sql = "SELECT name, image_link FROM games WHERE game_id = ?";
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.query(sql, [gameId], (err,  result) =>{
+            connection.end();
+            if(err){
+                reject(err);
+                return;
+            }
+
+            if(result.length == 0) {
+                resolve(null);
+            } else {
+                resolve(mapRowToGame(result[0]));
+            }
+        });
+    });
+}
+
 async function addGame(gameId) {
     // Get game data
     let game = await fetch(`${ENDPOINT}/games/${gameId}`)
@@ -38,5 +65,6 @@ async function addGame(gameId) {
 }
 
 module.exports = {
+    getGame,
     addGame
 }

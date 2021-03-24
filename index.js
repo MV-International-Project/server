@@ -136,7 +136,7 @@ router.delete("/users/blacklist", (req, res, next) => {
 
 router.get("/games", (req, res, next) => {
     let search = req.query.search;
-    gameRepository.addGame(3498).then(result => res.status(200).json(result))
+    gameRepository.getGame(3498).then(result => res.status(200).json(result))
     .catch(next);
 });
 
