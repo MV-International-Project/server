@@ -91,17 +91,22 @@ function getTokens(userId) {
         connection.connect((error) => {
             if (error) {
                 reject(error);
-            } else {
-                let sql = "SELECT * from discord where user_id = ?";
+            }
+            else {
+                let sql = "SELECT access_token, refresh_token from discord where user_id = ?";
                 connection.query(sql, [userId], (err, data) => {
                     connection.end();
                     if (err) {
                         reject(err);
                     } else {
-                        resolve({
-                            accessToken: data[0].access_token,
-                            refreshToken: data[0].refresh_token
-                        });
+                        if(data.length == 0) {
+                            resolve(null);
+                        } else {
+                            resolve({
+                                accessToken: data[0].access_token,
+                                refreshToken: data[0].refresh_token
+                            });
+                        }
                     }
                 })
             }

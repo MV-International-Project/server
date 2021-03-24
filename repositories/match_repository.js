@@ -51,8 +51,44 @@ function getMatch(firstUid, secondUid) {
     });
 }
 
+function getMatchSuggestion(userId, whitelist) {
+    /*
+        This function will look for people that have the most games in common with you,
+        if you already swiped someone or matches someone they will not be suggested to 
+        you anymore. If a whitelist is supplied only games with those game id's 
+        will be looked at.
+    */
+   
+    let sql = `SELECT users.user_id, COUNT(*) AS commongames FROM users
+    INNER JOIN user_games ON users.user_id = user_games.user_id
+    WHERE users.user_id != ?
+    AND NOT EXISTS(SELECT * FROM matches WHERE (first_user = ? AND second_user = users.user_id)
+            OR (first_user = users.user_id AND second_user = ?))
+    AND NOT EXISTS (SELECT * FROM pending_matches WHERE first_user = ? AND second_user = users.user_id)
+    ${whitelist ? `AND user_games.game_id IN (${connection.escape(whitelist)})` : ""}
+    AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
+    GROUP BY users.user_id
+    ORDER BY commongames DESC
+    LIMIT 1;`;
+
+    return new Promise((resolve, reject) => {
+    let connection = mysql.createConnection(config.db);
+        connection.query(sql, Array(5).fill(userId), (error, data) => {
+            if(error) {
+                reject(error);
+                return;
+            }
+
+            if(data.length == 0) {
+                resolve(null);
+            } else {
+                resolve(data[0].user_id);
+            }
+        });
+    });
+}
+
 function getAllMatches(uid){
-    console.log(uid);
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
@@ -60,7 +96,7 @@ function getAllMatches(uid){
                 reject(err);
             }
             else {
-                let sql = "  SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
+                let sql = "SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
                     " first_user, matched_at FROM matches WHERE second_user = ?";
                 connection.query(sql, [uid, uid], (error, data) => {
                     connection.end();
@@ -70,13 +106,14 @@ function getAllMatches(uid){
                     else {
                         resolve(data.map(matchDataToUser));
                     }
-                });
+                })
             }
-        })
-    })
+        });
+    });    
 }
 
 module.exports = {
     getMatch,
+    getMatchSuggestion,
     getAllMatches
 };
