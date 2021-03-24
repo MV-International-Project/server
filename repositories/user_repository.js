@@ -76,10 +76,9 @@ function getUserFromId(userId) {
                         reject(err);
                     }
                     else {
-                      console.log(data);
-                      console.log(data.length);
                         if(data.length == 0) {
                           resolve(null);
+                          return;
                         } 
 
                         resolve(dataToUser(data[0]));

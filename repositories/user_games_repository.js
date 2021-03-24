@@ -200,7 +200,8 @@ function resetBlacklist(userId) {
                     }
                     else {
                       if (result.affectedRows == 0) {
-                          reject("There are no games on your blacklist!")
+                          reject("There are no games on your blacklist!");
+                          return;
                       }
                         resolve(true);
                     }
@@ -233,6 +234,7 @@ function checkPendingMatches(userId, suggestedUserId) {
                     else {
                         if (result.length > 0) {
                             resolve(true);
+                            return;
                         }
                         resolve(false);
                     }
@@ -263,6 +265,7 @@ function checkCurrentMatches(userId, suggestedUserId) {
                     else {
                         if (result.length > 0) {
                             resolve(true);
+                            return;
                         }
                         resolve(false);
                     }
@@ -292,6 +295,7 @@ function acceptMatchSuggestion(userId, suggestedUserId) {
                     connection.end();
                     if(err){
                         reject(err);
+                        return;
                     }
                     else {
                         resolve(true);
@@ -318,6 +322,7 @@ function rejectPendingMatch(userId, suggestedUserId) {
                     connection.end();
                     if(err){
                         reject(err);
+                        return;
                     }
                     else {
                         resolve(true);
