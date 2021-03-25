@@ -79,12 +79,13 @@ function getMatchSuggestion(userId, whitelist) {
     AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
     GROUP BY users.user_id
     ORDER BY commongames DESC
-    LIMIT 2;`;
+    LIMIT 1;`;
 
     return new Promise((resolve, reject) => {
     let connection = mysql.createConnection(config.db);
         connection.query(sql, Array(5).fill(userId), (error, data) => {
             if(error) {
+                 console.log(data);
                 reject(error);
                 return;
             }
@@ -92,7 +93,8 @@ function getMatchSuggestion(userId, whitelist) {
             if(data.length == 0) {
                 resolve(null);
             } else {
-                resolve(data[0].user_id);
+                console.log(data);
+                resolve(data.map(matchSuggestion => matchSuggestion.user_id));
             }
         });
     });

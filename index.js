@@ -192,9 +192,10 @@ router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
 });
 
 router.post("/test", (req, res) => {
-    discordRepository.getUser()
-        .then(user => res.status(200).json(user))
-        .catch(err => console.log(err));
+    let userToken = jwt.sign({id: 4}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+   	console.log(userToken);
+
+    res.status(200).json(userToken);
 });
 
 app.use(errorHandler);
