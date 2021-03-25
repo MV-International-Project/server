@@ -76,6 +76,11 @@ router.get("/user", authenticateJWT, (req, res, next) => {
     }).catch(next);
 });
 
+router.get("/users/authenticated", authenticateJWT, (req, res) => {
+    res.status(200).json(true);
+});
+
+
 router.get("/users/login", (req, res, next) => {
     let code = req.query.code;
 

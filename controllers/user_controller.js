@@ -127,7 +127,6 @@ module.exports = {
     getAvatarPath,
     changeDescription,
     mapUserObject,
-    getAvatarPath,
     getDiscordTag
 };
 
