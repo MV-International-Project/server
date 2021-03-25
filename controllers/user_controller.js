@@ -17,7 +17,6 @@ async function handleLogin(code) {
     // Get user ID and user using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
-
     // Check if the user already exists in our database or not
     if(await userRepository.getUserFromId(uid) == null) {
         return await registerUser(user.username, "", accessToken, refreshToken);
@@ -67,7 +66,6 @@ async function loginUser(accessToken, refreshToken) {
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
-
     return userToken;
 }
 
@@ -127,7 +125,6 @@ module.exports = {
     getAvatarPath,
     changeDescription,
     mapUserObject,
-    getAvatarPath,
     getDiscordTag
 };
 
