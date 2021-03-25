@@ -134,7 +134,41 @@ function changeDescription(uid, description) {
     }))
 }
 
-function updateTokens(userId, accessToken, refreshToken) {
+function addBlockedToken(token) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+
+        let sql = "INSERT into blocked_tokens(token) VALUES(?)";
+        connection.query(sql, [token], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+                return;
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+function isTokenBlocked(token) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+
+        let sql = "SELECT token FROM blocked_tokens WHERE token = ? AND CURRENT_TIMESTAMP() < expiry";
+        connection.query(sql, [token], (err, data) => {
+            connection.end();
+            if (err) {
+                reject(err);
+                return;
+            } else {
+                resolve(data.length > 0);
+            }
+        });
+    });
+}
+
+function updateDiscordTokens(userId, accessToken, refreshToken) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((error) => {
@@ -158,7 +192,7 @@ function updateTokens(userId, accessToken, refreshToken) {
     });
 }
 
-function revokeTokens(userId) {
+function revokeDiscordTokens(userId) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((error) => {
@@ -186,7 +220,9 @@ module.exports = {
     addUser,
     getUserFromId,
     changeDescription,
+    addBlockedToken,
+    isTokenBlocked,
     getTokens,
-    revokeTokens,
-    updateTokens
+    revokeDiscordTokens,
+    updateDiscordTokens
 };
