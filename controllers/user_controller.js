@@ -102,19 +102,26 @@ async function getUserInformation(userId) {
     return mapUserObject(user, await getDiscordUser(userId));
 }
 
-async function changeDescription(uid, description){
-    if(uid == null || description == null){
+async function changeSettings(uid, description, username){
+    if(uid == null ||( description == null && username == null)){
         throw new AppError(400, "Bad Request");
     }
-    if(description.length > 100){
-        throw new AppError(400, "This description is too long.");
-    }
-
     if(await userRepository.getUserFromId(uid) == null){
         throw new AppError(404, "User not found");
     }
 
-    return await userRepository.changeDescription(uid, description);
+    const user = await userRepository.getUserFromId(uid);
+
+    if(description == null){
+        description = user.description;
+    }
+    if(username == null){
+        username = user.username
+    }
+    if(description.length > 100){
+        throw new AppError(400, "This description is too long.");
+    }
+    return await userRepository.changeSettings(uid, description, username);
 }
 
 async function getDiscordUser(userId) {
@@ -148,7 +155,7 @@ module.exports = {
     getUserInformation,
     getDiscordUser,
     getAvatarPath,
-    changeDescription,
+    changeSettings,
     mapUserObject,
     getDiscordTag
 };
