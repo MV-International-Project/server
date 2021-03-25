@@ -45,8 +45,7 @@ async function registerUser(username, description, accessToken, refreshToken) {
     }
 
     // Register user in userRepository
-    await userRepository.addUser(uid, username, getDiscordTag(user), 
-        description, accessToken, refreshToken);
+    await userRepository.addUser(uid, username,description, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
@@ -143,6 +142,7 @@ async function mapUserObject(user, discordUser) {
 
 module.exports = {
     handleLogin,
+    registerUser,
     logoutUser,
     isTokenBlocked,
     getUserInformation,
