@@ -1,6 +1,7 @@
 "use strict";
 
 const config = require('./config');
+var cors = require('cors')
 
 const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");
@@ -15,6 +16,7 @@ const colors = require("colors");
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 /*
     Error handler
