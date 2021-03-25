@@ -11,6 +11,16 @@ function dataToMatch(data) {
     return match
 }
 
+function dataToMatchSuggestion(data) {
+    const matchSuggestion = {};
+
+    for (let i in data) {
+        matchSuggestion[i] = data[i].user_id;
+    }
+    
+    return matchSuggestion
+}
+
 function matchDataToUser(data) {
     let match;
     if(data.first_user != null){
@@ -71,7 +81,7 @@ function getMatchSuggestion(userId, whitelist) {
     AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
     GROUP BY users.user_id
     ORDER BY commongames DESC
-    LIMIT 1;`;
+    LIMIT 2;`;
         connection.query(sql, Array(5).fill(userId), (error, data) => {
             if(error) {
                 reject(error);
@@ -81,7 +91,7 @@ function getMatchSuggestion(userId, whitelist) {
             if(data.length == 0) {
                 resolve(null);
             } else {
-                resolve(data[0].user_id);
+                resolve(data.map(matchSuggestion => matchSuggestion.user_id));
             }
         });
     });
