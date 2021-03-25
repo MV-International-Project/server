@@ -9,6 +9,8 @@ const userGamesController = require("./controllers/user_games_controller");
 const gameController = require("./controllers/game_controller");
 const matchController = require("./controllers/match_controller");
 
+const userFactory = require("./generatedummydata");
+
 const http = require("http");
 const express = require("express");
 const jwt = require('jsonwebtoken');
@@ -72,13 +74,13 @@ router.get("/users/authenticated", authenticateJWT, (req, res) => {
 });
 
 
-router.post("/users/login", (req, res, next) => {
+router.get("/users/login", (req, res, next) => {
     let code = req.query.code;
 
     userController.handleLogin(code)
         .then(result => {
             res.status(200)
-            .cookie("authToken", result, {httpOnly: true, maxAge: 604800000})
+            .cookie("authToken", result, {httpOnly: false, maxAge: 604800000})
             .redirect(config.clientPath);
         }).catch(next);
 });
@@ -193,10 +195,8 @@ router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
 });
 
 router.post("/test", (req, res) => {
-    let userToken = jwt.sign({id: 4}, config.jsonwebtoken.key, { algorithm: 'HS256'});
-   	console.log(userToken);
-
-    res.status(200).json(userToken);
+    userFactory.generateUsers();
+    res.status(200).end();
 });
 
 app.use(errorHandler);

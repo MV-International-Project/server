@@ -43,7 +43,7 @@ paths:
         '404':
           description: "User not found: unable to change settings"
   /users/login:
-    post:
+    get:
       description: "API call to login using your discord auth code."
       tags:
         - "User"

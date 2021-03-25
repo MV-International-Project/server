@@ -32,9 +32,9 @@ async function addUser(userId, username, discordName, description, accessToken, 
             });
 
             // Add the users discord information
-            sql = `INSERT INTO discord(user_id, discord_id, access_token, refresh_token)
-            VALUES(?, ?, ?, ?);`;
-            connection.query(sql, [userId, discordName, accessToken, refreshToken], (err) => {
+            sql = `INSERT INTO discord(user_id, access_token, refresh_token)
+            VALUES(?, ?, ?);`;
+            connection.query(sql, [userId, accessToken, refreshToken], (err) => {
                 connection.end();
                 if (err) {
                     reject(err);
