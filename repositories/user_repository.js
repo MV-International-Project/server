@@ -219,7 +219,7 @@ function revokeDiscordTokens(userId) {
 module.exports = {
     addUser,
     getUserFromId,
-     changeSettings,
+    changeSettings,
     addBlockedToken,
     isTokenBlocked,
     getTokens,

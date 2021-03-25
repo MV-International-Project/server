@@ -121,7 +121,7 @@ async function changeSettings(uid, description, username){
     if(description.length > 100){
         throw new AppError(400, "This description is too long.");
     }
-    return await userRepository.changeDescription(uid, description, username);
+    return await userRepository.changeSettings(uid, description, username);
 }
 
 async function getDiscordUser(userId) {
