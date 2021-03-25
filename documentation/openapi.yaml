@@ -39,9 +39,9 @@ paths:
                   type: string
       responses:
         '200':
-          description: "OK, modified description"
+          description: "OK, modified user settings"
         '404':
-          description: "User not found: unable to change description"
+          description: "User not found: unable to change settings"
   /users/login:
     post:
       description: "API call to login using your discord auth code."
