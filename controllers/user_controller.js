@@ -88,7 +88,9 @@ async function changeSettings(uid, description, username){
     if(await userRepository.getUserFromId(uid) == null){
         throw new AppError(404, "User not found");
     }
+
     const user = await userRepository.getUserFromId(uid);
+
     if(description == null){
         description = user.description;
     }
