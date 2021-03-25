@@ -7,16 +7,22 @@ const userGamesController = require("../controllers/user_games_controller");
 const { AppError } = require('../errors');
 
 async function getMatchSuggestion(uid, whitelist) {
-    const potentialMatchId = await matchRepository.getMatchSuggestion(uid, whitelist);
+    const matchSuggestions = [];
+    const potentialMatchIds = await matchRepository.getMatchSuggestion(uid, whitelist);
 
-    if(potentialMatchId === null) {
+    if(potentialMatchIds === null) {
         throw new AppError(404, "No potential matches found.");
     }
 
-    const potentialMatch = await userRepository.getUserFromId(potentialMatchId);
-    const potentialMatchDiscord = await userController.getDiscordUser(potentialMatchId);
+    for(let matchSuggestion in potentialMatchIds) {
+        const potentialMatch = await userRepository.getUserFromId(matchSuggestion);
+        const potentialMatchDiscord = await userController.getDiscordUser(matchSuggestion);
 
-    return await mapMatchObject(potentialMatch, potentialMatchDiscord);
+        matchSuggestions.push(await mapMatchObject(potentialMatch, potentialMatchDiscord));
+    }
+
+    return matchSuggestions;
+    
 }
 
 async function getInfoOfMatchedUser(uid, matchedId) {
