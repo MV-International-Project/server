@@ -58,18 +58,6 @@ const authenticateJWT = (req, res, next) => {
 const router = express.Router();
 app.use('/api', router);
 
-router.post("/users/register", (req, res, next) => {
-    let body = req.body;
-    let username = body.username;
-    let description = body.description;
-    let accessToken = body.access_token;
-    let refreshToken = body.refresh_token;
-
-    userController.registerUser(username, description, accessToken, refreshToken)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-});
-
 router.get("/user", authenticateJWT, (req, res, next) => {
     const userId = req.user_id;
     userController.getUserInformation(userId).then(user => {
@@ -82,7 +70,7 @@ router.get("/users/authenticated", authenticateJWT, (req, res) => {
 });
 
 
-router.get("/users/login", (req, res, next) => {
+router.post("/users/login", (req, res, next) => {
     let code = req.query.code;
 
     userController.handleLogin(code)
@@ -106,7 +94,8 @@ router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
     let gameId = req.params.game_id;
     userGamesController.removeGameFromUser(userId, gameId)
-    .catch(next);
+        .then(result => res.status(200).json(result))
+        .catch(next);
 });
 
 router.post("/users/games/:game_id", authenticateJWT, (req, res, next) => {
@@ -181,8 +170,8 @@ router.get("/users/matchSuggestion", authenticateJWT, (req, res, next) => {
     .catch(next);
 });
 
-router.patch("/users/matchSuggestion/:user_id", authenticateJWT, (req, res, next) => {
-    let suggestedUserId = req.params.user_id;
+router.patch("/users/matchSuggestion/:suggested_user_id", authenticateJWT, (req, res, next) => {
+    let suggestedUserId = req.params.suggested_user_id;
     let body = req.body;
     let accepted = body.accept;
     let userId = req.user_id;

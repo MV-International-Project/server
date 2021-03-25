@@ -17,7 +17,6 @@ async function handleLogin(code) {
     // Get user ID and user using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
-
     // Check if the user already exists in our database or not
     if(await userRepository.getUserFromId(uid) == null) {
         return await registerUser(user.username, "", accessToken, refreshToken);
