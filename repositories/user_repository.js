@@ -63,22 +63,16 @@ async function getUserFromId(userId) {
     let sql = "SELECT * from users where user_id = ?";
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId], (err, data) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [userId], (err, data) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (data.length == 0) {
-                            resolve(null);
-                            return;
-                        }
-                        resolve(dataToUser(data[0]));
-                    }
-                });
+                if (data.length == 0) {
+                    resolve(null);
+                    return;
+                }
+                resolve(dataToUser(data[0]));
             }
         });
     });
@@ -88,32 +82,26 @@ async function getTokens(userId) {
     let sql = "SELECT access_token, refresh_token from discord where user_id = ?";
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId], (err, data) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [userId], (err, data) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (data.length == 0) {
-                            resolve(null);
-                        } else {
-                            resolve({
-                                accessToken: data[0].access_token,
-                                refreshToken: data[0].refresh_token
-                            });
-                        }
-                    }
-                });
+                if (data.length == 0) {
+                    resolve(null);
+                } else {
+                    resolve({
+                        accessToken: data[0].access_token,
+                        refreshToken: data[0].refresh_token
+                    });
+                }
             }
         });
     });
 }
 
 async function changeSettings(uid, description, username) {
-    let sql = "UPDATE users SET description = ? where user_id = ?";
+    let sql = "UPDATE users SET description = ?, username = ? where user_id = ?";
     let connection = await connector.createConnection();
     return new Promise(((resolve, reject) => {
         connection.query(sql, [description, username, uid], (err) => {
@@ -165,18 +153,12 @@ async function updateDiscordTokens(userId, accessToken, refreshToken) {
                     WHERE user_id = ?`;
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [accessToken, refreshToken, userId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [accessToken, refreshToken, userId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(true);
-                    }
-                });
+                resolve(true);
             }
         });
     });
@@ -189,18 +171,12 @@ async function revokeDiscordTokens(userId) {
                     WHERE user_id = ?`;
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, ['', '', userId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, ['', '', userId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(true);
-                    }
-                });
+                resolve(true);
             }
         });
     });
