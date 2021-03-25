@@ -33,7 +33,7 @@ function userIdToUser(data) {
 }
 
 async function connectGameToUser(uid, gid, hoursPlayed, rank) {
-    let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
+    let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`) VALUES(?,?,?,?) ";
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
         connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
