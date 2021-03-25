@@ -69,7 +69,7 @@ function getMatchSuggestion(userId, whitelist) {
     AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
     GROUP BY users.user_id
     ORDER BY commongames DESC
-    LIMIT 1;`;
+    LIMIT 2;`;
 
     return new Promise((resolve, reject) => {
     let connection = mysql.createConnection(config.db);
