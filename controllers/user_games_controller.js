@@ -34,25 +34,7 @@ async function addGameToBlackList(userId, gameId) {
 }
 
 
-async function removeGameFromBlackList(userId, gameId) {
-    if (userId == null || gameId == null) {
-        throw new AppError(400, "Bad request");
-    }
 
-    // Make sure the user exists
-    if (await userRepository.getUserFromId(userId) == null) {
-        throw new AppError(404, "User not found.");
-    }
-
-    // Make sure the game exists
-    if (await gameController.getGameById(gameId) == null) {
-        throw new AppError(404, "Game not found.");
-    }
-
-    // Add game to blacklist
-    await userGamesRepository.removeGameFromBlackList(userId, gameId);
-    return true;
-}
 
 
 async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
