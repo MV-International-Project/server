@@ -2,8 +2,10 @@
 
 const mysql = require("mysql");
 const fetch = require('node-fetch');
+
 const { AppError } = require("../errors");
 const config = require("../config");
+
 const ENDPOINT = "https://api.rawg.io/api";
 
 function mapRowToGame(row) {
@@ -67,4 +69,4 @@ async function addGame(gameId) {
 module.exports = {
     getGame,
     addGame
-}
+};

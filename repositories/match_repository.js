@@ -1,3 +1,5 @@
+"use strict";
+
 const mysql = require("mysql");
 const config = require("../config");
 const { AppError } = require('../errors');
@@ -29,6 +31,7 @@ function matchDataToUser(data) {
 }
 
 function getMatch(firstUid, secondUid) {
+    let sql = "SELECT * from matches where first_user = ? and second_user = ?";
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
@@ -36,7 +39,6 @@ function getMatch(firstUid, secondUid) {
                 reject(err);
             }
             else {
-                let sql = "SELECT * from matches where first_user = ? and second_user = ?";
                 connection.query(sql, [firstUid, secondUid], (error, data) => {
                     connection.end();
                     if(error){
@@ -88,6 +90,8 @@ function getMatchSuggestion(userId, whitelist) {
 }
 
 function getAllMatches(uid){
+    let sql = "SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
+        " first_user, matched_at FROM matches WHERE second_user = ?";
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((err) => {
@@ -95,8 +99,6 @@ function getAllMatches(uid){
                 reject(err);
             }
             else {
-                let sql = "SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
-                    " first_user, matched_at FROM matches WHERE second_user = ?";
                 connection.query(sql, [uid, uid], (error, data) => {
                     connection.end();
                     if(error){
