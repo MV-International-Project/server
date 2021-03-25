@@ -80,24 +80,6 @@ async function getAllGamesFromUser(uid) {
     });
 }
 
-async function addGameToBlackList(userId, gameId) {
-    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
-    let connection = await connector.createConnection(config.db);
-    return new Promise((resolve, reject) => {
-        connection.query(sql, [userId, gameId], (err, result) => {
-            connection.end();
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows == 0) {
-                    reject("This game is already on your blacklist!")
-                }
-                resolve(true);
-            }
-        });
-    });
-}
-
 
 async function removeGameFromBlackList(userId, gameId) {
     let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND game_id = ? AND blacklist = 1";
