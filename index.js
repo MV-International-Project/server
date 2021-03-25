@@ -1,7 +1,7 @@
 "use strict";
 
 const config = require('./config');
-var cors = require('cors')
+const cors = require('cors');
 
 const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");

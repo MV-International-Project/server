@@ -1,5 +1,3 @@
-"use strict";
-
 const {AppError} = require('../errors');
 
 const gameRepository = require("../repositories/game_repository");
@@ -37,10 +35,13 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     if (accepted) {
         if (await userGamesRepository.checkPendingMatches(userId, suggestedUserId)) {
             await userGamesRepository.newMatch(userId, suggestedUserId);
+            console.log(`User ${userId} and user ${suggestedUserId} just matcheed.`);
         } else {
             await userGamesRepository.acceptMatchSuggestion(userId, suggestedUserId);
+            console.log(`User ${userId} has accepted his ${suggestedUserId} match suggestion.`);
         }
     } else {
+        console.log(`User ${userId} has rejected his ${suggestedUserId} match suggestion.`);
         await userGamesRepository.rejectPendingMatch(userId, suggestedUserId);
     }
     return true;
@@ -69,6 +70,7 @@ async function connectGameToUser(uid, gid, hoursPlayed = 0, rank = null) {
         throw new AppError(400, "You already have this game.");
     }
 
+    console.log(`User ${uid} has added game ${gid} to their games.`);
     return await userGamesRepository.connectGameToUser(uid, gid, hoursPlayed, rank);
 }
 
@@ -84,6 +86,7 @@ async function removeGameFromUser(uid, gid) {
         throw new AppError(400, "You don't have this game");
     }
 
+    console.log(`User ${uid} has removed game ${gid} from their games.`);
     return await userGamesRepository.removeGameFromUser(uid, gid);
 
 }

@@ -1,5 +1,3 @@
-"use strict";
-
 const mysql = require("mysql");
 const fetch = require('node-fetch');
 
