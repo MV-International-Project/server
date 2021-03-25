@@ -200,37 +200,6 @@ paths:
       responses:
         '200':
           description: "OK, deleted game from the user's games."
-  /users/blacklist/{game_id}:
-    post:
-      description: "Add a game to the user's blacklist."
-      tags:
-        - "User"
-      parameters:
-        - in: path
-          name: game_id
-          schema:
-            type: integer
-          required: true
-      responses:
-        '200':
-          description: "OK, added game to the user's blacklist"
-        '400':
-          description: "This game is already in the user's blacklist"
-    delete:
-      description: "Remove a game from the user's blacklist."
-      tags:
-        - "User"
-      parameters:
-        - in: path
-          name: game_id
-          schema:
-            type: integer
-          required: true
-      responses:
-        '200':
-          description: "OK, deleted game from the user's blacklist"
-        '404':
-          description: 'Game not found in blacklist'
   /users/blacklist:
     delete:
       description: "Remove all the games from the user's blacklist."
