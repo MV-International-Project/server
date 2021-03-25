@@ -69,7 +69,7 @@ async function loginUser(accessToken, refreshToken) {
         expiresIn: '3d'
     });
 
-    console.log(`User (${uid}) has logged in.`);
+    console.log(`User ${uid} has logged in.`);
     return userToken;
 }
 
@@ -84,7 +84,7 @@ async function logoutUser(userId, token) {
         // Block the user's JSON token
         await userRepository.addBlockedToken(token);
 
-        console.log(`User (${uid}) has logged out.`);
+        console.log(`User ${uid} has logged out.`);
         return true;
     } catch (err) {
         throw err;
