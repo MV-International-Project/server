@@ -13,47 +13,6 @@ async function getGamesFromUser(userId) {
     return await userGamesRepository.getAllGamesFromUser(userId);
 }
 
-async function addGameToBlackList(userId, gameId) {
-    if (userId == null || gameId == null) {
-        throw new AppError(400, "Bad request");
-    }
-
-    // Make sure the user exists
-    if (await userRepository.getUserFromId(userId) == null) {
-        throw new AppError(404, "User not found.");
-    }
-
-    // Make sure the game exists
-    if (await gameController.getGameById(gameId) == null) {
-        throw new AppError(404, "Game not found.");
-    }
-
-    // Add game to blacklist
-    await userGamesRepository.addGameToBlackList(userId, gameId);
-    return true;
-}
-
-
-async function removeGameFromBlackList(userId, gameId) {
-    if (userId == null || gameId == null) {
-        throw new AppError(400, "Bad request");
-    }
-
-    // Make sure the user exists
-    if (await userRepository.getUserFromId(userId) == null) {
-        throw new AppError(404, "User not found.");
-    }
-
-    // Make sure the game exists
-    if (await gameController.getGameById(gameId) == null) {
-        throw new AppError(404, "Game not found.");
-    }
-
-    // Add game to blacklist
-    await userGamesRepository.removeGameFromBlackList(userId, gameId);
-    return true;
-}
-
 
 async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     if (userId == null || suggestedUserId == null || accepted == null) {
@@ -87,18 +46,6 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     return true;
 }
 
-async function resetBlacklist(userId) {
-    if (userId == null) {
-        throw new AppError(400, "Bad request");
-    }
-
-    if (await userRepository.getUserFromId(userId) == null) {
-        throw new AppError(404, "User not found.");
-    }
-    // Reset blacklist
-    await userGamesRepository.resetBlacklist(userId);
-    return true;
-}
 
 async function hasGame(uid, gid) {
     let userGames = await userGamesRepository.getAllGamesFromUser(uid);
@@ -142,9 +89,6 @@ async function removeGameFromUser(uid, gid) {
 }
 
 module.exports = {
-    addGameToBlackList,
-    removeGameFromBlackList,
-    resetBlacklist,
     getGamesFromUser,
     connectGameToUser,
     removeGameFromUser,

@@ -123,35 +123,6 @@ router.patch("/user", authenticateJWT, (req, res, next) => {
         .catch(next);
 });
 
-router.post("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
-    let params = req.params;
-    let gameId = params.game_id;
-    let userId = req.user_id;
-
-    userGamesController.addGameToBlackList(userId, gameId)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-
-});
-
-router.delete("/users/blacklist/:game_id", authenticateJWT, (req, res, next) => {
-    let params = req.params;
-    let gameId = params.game_id;
-    let userId = req.user_id;
-
-
-    userGamesController.removeGameFromBlackList(userId, gameId)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-});
-
-router.delete("/users/blacklist", authenticateJWT, (req, res, next) => {
-    let userId = req.user_id;
-
-    userGamesController.resetBlacklist(userId)
-    .then(result => res.status(200).json(result))
-    .catch(next);
-});
 
 router.get("/users/matches", authenticateJWT, (req,res, next) => {
     let userId = req.user_id;

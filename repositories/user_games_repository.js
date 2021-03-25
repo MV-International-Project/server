@@ -33,7 +33,7 @@ function userIdToUser(data) {
 }
 
 async function connectGameToUser(uid, gid, hoursPlayed, rank) {
-    let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
+    let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`) VALUES(?,?,?,?) ";
     let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
         connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
@@ -75,62 +75,6 @@ async function getAllGamesFromUser(uid) {
                 reject(error);
             } else {
                 resolve(data.map(dataToGames));
-            }
-        });
-    });
-}
-
-async function addGameToBlackList(userId, gameId) {
-    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
-    let connection = await connector.createConnection(config.db);
-    return new Promise((resolve, reject) => {
-        connection.query(sql, [userId, gameId], (err, result) => {
-            connection.end();
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows == 0) {
-                    reject("This game is already on your blacklist!")
-                }
-                resolve(true);
-            }
-        });
-    });
-}
-
-
-async function removeGameFromBlackList(userId, gameId) {
-    let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND game_id = ? AND blacklist = 1";
-    let connection = await connector.createConnection(config.db);
-    return new Promise((resolve, reject) => {
-        connection.query(sql, [userId, gameId], (err, result) => {
-            connection.end();
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows == 0) {
-                    reject("This game is not on your blacklist!")
-                }
-                resolve(true);
-            }
-        });
-    });
-}
-
-async function resetBlacklist(userId) {
-    let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
-    let connection = await connector.createConnection(config.db);
-    return new Promise((resolve, reject) => {
-        connection.query(sql, [userId], (err, result) => {
-            connection.end();
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows == 0) {
-                    reject("There are no games on your blacklist!");
-                    return;
-                }
-                resolve(true);
             }
         });
     });
@@ -263,12 +207,9 @@ async function newMatch(userId, suggestedUserId) {
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
-    addGameToBlackList,
-    removeGameFromBlackList,
     acceptMatchSuggestion,
     checkPendingMatches,
     newMatch,
-    resetBlacklist,
     removeGameFromUser,
     rejectPendingMatch,
     checkCurrentMatches
