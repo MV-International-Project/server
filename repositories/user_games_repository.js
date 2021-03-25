@@ -207,12 +207,9 @@ async function newMatch(userId, suggestedUserId) {
 module.exports = {
     connectGameToUser,
     getAllGamesFromUser,
-    addGameToBlackList,
-    removeGameFromBlackList,
     acceptMatchSuggestion,
     checkPendingMatches,
     newMatch,
-    resetBlacklist,
     removeGameFromUser,
     rejectPendingMatch,
     checkCurrentMatches
