@@ -52,7 +52,7 @@ function refreshAccessToken() {
 
 function revokeToken(token, type) {
     return new Promise((resolve, reject) => {
-        fetch(`${ENDPOINT}/oauth2/token`, {
+        fetch(`${ENDPOINT}/oauth2/token/revoke`, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"

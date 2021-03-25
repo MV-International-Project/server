@@ -134,7 +134,7 @@ function changeDescription(uid, description) {
     }))
 }
 
-function updateTokens(userId, discordName, accessToken, refreshToken) {
+function updateTokens(userId, accessToken, refreshToken) {
     return new Promise((resolve, reject) => {
         let connection = mysql.createConnection(config.db);
         connection.connect((error) => {
@@ -142,11 +142,10 @@ function updateTokens(userId, discordName, accessToken, refreshToken) {
                 reject(error);
             } else {
                 let sql = `UPDATE discord 
-                    SET discord_id = ?,
                     access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-                connection.query(sql, [discordName, accessToken, refreshToken, userId], (err) => {
+                connection.query(sql, [accessToken, refreshToken, userId], (err) => {
                     connection.end();
                     if (err) {
                         reject(err);
@@ -159,10 +158,35 @@ function updateTokens(userId, discordName, accessToken, refreshToken) {
     });
 }
 
+function revokeTokens(userId) {
+    return new Promise((resolve, reject) => {
+        let connection = mysql.createConnection(config.db);
+        connection.connect((error) => {
+            if (error) {
+                reject(error);
+            } else {
+                let sql = `UPDATE discord 
+                    SET access_token = ?, 
+                    refresh_token = ?
+                    WHERE user_id = ?`;
+                connection.query(sql, ['', '', userId], (err) => {
+                    connection.end();
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                });
+            }
+        });
+    });    
+}
+
 module.exports = {
     addUser,
     getUserFromId,
     changeDescription,
     getTokens,
+    revokeTokens,
     updateTokens
 };

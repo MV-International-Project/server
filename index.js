@@ -94,8 +94,11 @@ router.get("/users/login", (req, res, next) => {
 
 router.post("/users/logout", authenticateJWT, (req, res, next) => {
     userController.logoutUser(req.user_id)
-    .then(result => res.status(200).json(result))
-    .catch(next);
+    .then(result => {
+        res.status(200)
+        .clearCookie("authToken")
+        .json(result);
+    }).catch(next);
 });
 
 router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {

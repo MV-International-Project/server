@@ -63,7 +63,7 @@ async function loginUser(accessToken, refreshToken) {
     let uid = user.id;
 
     // Login user and update his access / refresh tokens
-    await userRepository.updateTokens(uid, getDiscordTag(user), accessToken, refreshToken);
+    await userRepository.updateTokens(uid, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
@@ -71,8 +71,18 @@ async function loginUser(accessToken, refreshToken) {
     return userToken;
 }
 
-async function logoutUser() {
+async function logoutUser(userId) {
     // Revoke the user's discord tokens
+
+    try {
+        const discordTokens = await userRepository.getTokens(userId);
+        await userRepository.revokeTokens(userId);
+        await discordRepository.revokeToken(discordTokens.accessToken, "access_token");
+        await discordRepository.revokeToken(discordTokens.refreshToken, "refresh_token");
+        return true;
+    }catch(err) {
+        throw err;
+    }
 }
 
 async function getUserInformation(userId) {
@@ -126,6 +136,7 @@ async function mapUserObject(user, discordUser) {
 
 module.exports = {
     handleLogin,
+    logoutUser,
     getUserInformation,
     getDiscordUser,
     getAvatarPath,
