@@ -17,7 +17,6 @@ async function handleLogin(code) {
     // Get user ID and user using the access token
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
-
     // Check if the user already exists in our database or not
     if(await userRepository.getUserFromId(uid) == null) {
         return await registerUser(user.username, "", accessToken, refreshToken);
@@ -63,13 +62,35 @@ async function loginUser(accessToken, refreshToken) {
     let uid = user.id;
 
     // Login user and update his access / refresh tokens
-    await userRepository.updateTokens(uid, getDiscordTag(user), accessToken, refreshToken);
+    await userRepository.updateDiscordTokens(uid, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
-    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256',
+    expiresIn: '3d'});
 
     return userToken;
 }
+
+async function logoutUser(userId, token) {
+    try {
+        // Revoke the user's discord tokens
+        const discordTokens = await userRepository.getTokens(userId);
+        await userRepository.revokeDiscordTokens(userId);
+        await discordRepository.revokeToken(discordTokens.accessToken, "access_token");
+        await discordRepository.revokeToken(discordTokens.refreshToken, "refresh_token");
+
+        // Block the user's JSON token
+        userRepository.addBlockedToken(token);
+
+        return true;
+    } catch(err) {
+        throw err;
+    }
+}
+
+async function isTokenBlocked(token) {
+    return await userRepository.isTokenBlocked(token);
+} 
 
 async function getUserInformation(userId) {
     const user = await userRepository.getUserFromId(userId);
@@ -78,7 +99,7 @@ async function getUserInformation(userId) {
         throw new AppError(404, "Authenticated user not found.");
     }
 
-    return mapUserObject(user, getDiscordUser(userId));
+    return mapUserObject(user, await getDiscordUser(userId));
 }
 
 async function changeSettings(uid, description, username){
@@ -129,10 +150,12 @@ async function mapUserObject(user, discordUser) {
 
 module.exports = {
     handleLogin,
+    logoutUser,
+    isTokenBlocked,
     getUserInformation,
     getDiscordUser,
     getAvatarPath,
-    changeDescription: changeSettings,
+    changeSettings,
     mapUserObject,
     getDiscordTag
 };

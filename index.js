@@ -1,6 +1,7 @@
 "use strict";
 
 const config = require('./config');
+var cors = require('cors')
 
 const {AppError} = require('./errors');
 const userController = require("./controllers/user_controller");
@@ -15,6 +16,7 @@ const colors = require("colors");
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 /*
     Error handler
@@ -39,11 +41,12 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1]; // Bearer TOKEN
 
-        jwt.verify(token, config.jsonwebtoken.key, (err, payload) => {
-            if (err) {
+        jwt.verify(token, config.jsonwebtoken.key, async (err, payload) => {
+            if (err || await userController.isTokenBlocked(token)) {
                 return res.sendStatus(403);
             }
             req.user_id = payload.id;
+            req.token = token;
             next();
         });
     } else {
@@ -57,18 +60,6 @@ const authenticateJWT = (req, res, next) => {
 const router = express.Router();
 app.use('/api', router);
 
-router.post("/users/register", (req, res, next) => {
-    let body = req.body;
-    let username = body.username;
-    let description = body.description;
-    let accessToken = body.access_token;
-    let refreshToken = body.refresh_token;
-
-    userController.registerUser(username, description, accessToken, refreshToken)
-        .then(result => res.status(200).json(result))
-        .catch(next);
-});
-
 router.get("/user", authenticateJWT, (req, res, next) => {
     const userId = req.user_id;
     userController.getUserInformation(userId).then(user => {
@@ -81,7 +72,7 @@ router.get("/users/authenticated", authenticateJWT, (req, res) => {
 });
 
 
-router.get("/users/login", (req, res, next) => {
+router.post("/users/login", (req, res, next) => {
     let code = req.query.code;
 
     userController.handleLogin(code)
@@ -92,11 +83,21 @@ router.get("/users/login", (req, res, next) => {
         }).catch(next);
 });
 
+router.post("/users/logout", authenticateJWT, (req, res, next) => {
+    userController.logoutUser(req.user_id, req.token)
+    .then(result => {
+        res.status(200)
+        .clearCookie("authToken")
+        .json(result);
+    }).catch(next);
+});
+
 router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
     let gameId = req.params.game_id;
     userGamesController.removeGameFromUser(userId, gameId)
-    .catch(next);
+        .then(result => res.status(200).json(result))
+        .catch(next);
 });
 
 router.post("/users/games/:game_id", authenticateJWT, (req, res, next) => {
@@ -115,7 +116,7 @@ router.patch("/user", authenticateJWT, (req, res, next) => {
     let uid = req.user_id;
     let description = body.description;
     let username = body.username;
-    userController.changeDescription(uid, description, username)
+    userController.changeSettings(uid, description, username)
         .then(result => res.status(200).json(result))
         .catch(next);
 });
@@ -171,8 +172,8 @@ router.get("/users/matchSuggestion", authenticateJWT, (req, res, next) => {
     .catch(next);
 });
 
-router.patch("/users/matchSuggestion/:user_id", authenticateJWT, (req, res, next) => {
-    let suggestedUserId = req.params.user_id;
+router.patch("/users/matchSuggestion/:suggested_user_id", authenticateJWT, (req, res, next) => {
+    let suggestedUserId = req.params.suggested_user_id;
     let body = req.body;
     let accepted = body.accept;
     let userId = req.user_id;
@@ -192,9 +193,10 @@ router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
 });
 
 router.post("/test", (req, res) => {
-    discordRepository.getUser()
-        .then(user => res.status(200).json(user))
-        .catch(err => console.log(err));
+    let userToken = jwt.sign({id: 4}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+   	console.log(userToken);
+
+    res.status(200).json(userToken);
 });
 
 app.use(errorHandler);

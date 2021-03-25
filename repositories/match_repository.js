@@ -52,14 +52,16 @@ function getMatch(firstUid, secondUid) {
 }
 
 function getMatchSuggestion(userId, whitelist) {
-    /*
-        This function will look for people that have the most games in common with you,
-        if you already swiped someone or matches someone they will not be suggested to 
-        you anymore. If a whitelist is supplied only games with those game id's 
-        will be looked at.
-    */
-   
-    let sql = `SELECT users.user_id, COUNT(*) AS commongames FROM users
+    return new Promise((resolve, reject) => {
+    let connection = mysql.createConnection(config.db);
+        /*
+            This function will look for people that have the most games in common with you,
+            if you already swiped someone or matches someone they will not be suggested to
+            you anymore. If a whitelist is supplied only games with those game id's
+            will be looked at.
+        */
+
+        let sql = `SELECT users.user_id, COUNT(*) AS commongames FROM users
     INNER JOIN user_games ON users.user_id = user_games.user_id
     WHERE users.user_id != ?
     AND NOT EXISTS(SELECT * FROM matches WHERE (first_user = ? AND second_user = users.user_id)
@@ -69,10 +71,7 @@ function getMatchSuggestion(userId, whitelist) {
     AND EXISTS(SELECT game_id FROM user_games ug2 WHERE user_games.game_id = ug2.game_id AND ug2.user_id = ?)
     GROUP BY users.user_id
     ORDER BY commongames DESC
-    LIMIT 1;`;
-
-    return new Promise((resolve, reject) => {
-    let connection = mysql.createConnection(config.db);
+    LIMIT 2;`;
         connection.query(sql, Array(5).fill(userId), (error, data) => {
             if(error) {
                 reject(error);
@@ -82,7 +81,7 @@ function getMatchSuggestion(userId, whitelist) {
             if(data.length == 0) {
                 resolve(null);
             } else {
-                resolve(data[0].user_id);
+                resolve(data.map(matchSuggestion => matchSuggestion.user_id));
             }
         });
     });
