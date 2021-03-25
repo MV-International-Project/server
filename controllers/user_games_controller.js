@@ -89,8 +89,8 @@ async function removeGameFromUser(uid, gid) {
 }
 
 module.exports = {
-    addGameToBlackList,
     getGamesFromUser,
     connectGameToUser,
+    removeGameFromUser,
     respondToMatchSuggestion
 };
