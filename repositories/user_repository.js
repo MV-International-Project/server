@@ -13,7 +13,7 @@ function dataToUser(data) {
     return user;
 }
 
-async function addUser(userId, username, discordName, description, accessToken, refreshToken) {
+async function addUser(userId, username, description, accessToken, refreshToken) {
     // Add user to the users table
     let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
     let connection = await connector.createConnection(config.db);
