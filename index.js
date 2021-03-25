@@ -39,11 +39,12 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1]; // Bearer TOKEN
 
-        jwt.verify(token, config.jsonwebtoken.key, (err, payload) => {
-            if (err) {
+        jwt.verify(token, config.jsonwebtoken.key, async (err, payload) => {
+            if (err || await userController.isTokenBlocked(token)) {
                 return res.sendStatus(403);
             }
             req.user_id = payload.id;
+            req.token = token;
             next();
         });
     } else {
@@ -78,6 +79,15 @@ router.post("/users/login", (req, res, next) => {
             .cookie("authToken", result, {httpOnly: true, maxAge: 604800000})
             .redirect(config.clientPath);
         }).catch(next);
+});
+
+router.post("/users/logout", authenticateJWT, (req, res, next) => {
+    userController.logoutUser(req.user_id, req.token)
+    .then(result => {
+        res.status(200)
+        .clearCookie("authToken")
+        .json(result);
+    }).catch(next);
 });
 
 router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
