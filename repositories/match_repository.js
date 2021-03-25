@@ -11,6 +11,16 @@ function dataToMatch(data) {
     return match
 }
 
+function dataToMatchSuggestion(data) {
+    const matchSuggestion = {};
+
+    for (let i in data) {
+        matchSuggestion[i] = data[i].user_id;
+    }
+    
+    return matchSuggestion
+}
+
 function matchDataToUser(data) {
     let match;
     if(data.first_user != null){
