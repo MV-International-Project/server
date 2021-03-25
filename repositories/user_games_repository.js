@@ -1,7 +1,10 @@
 "use strict";
 
 const mysql = require("mysql");
+
 const config = require("../config");
+const connector = require("../connection");
+
 const user_repo = require("./user_repository");
 
 function dataToGames(data) {
@@ -29,261 +32,184 @@ function userIdToUser(data) {
     });
 }
 
-function connectGameToUser(uid, gid, hoursPlayed, rank) {
+async function connectGameToUser(uid, gid, hoursPlayed, rank) {
     let sql = "INSERT into user_games(user_id, game_id, hours_played, `rank`, blacklist) VALUES(?,?,?,?, false) ";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((err) => {
-            if (err) {
-                reject(err);
+        connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
+            connection.end();
+            if (error) {
+                reject(error);
             } else {
-                connection.query(sql, [uid, gid, hoursPlayed, rank], (error) => {
-                    connection.end();
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(true);
-                    }
-                });
+                resolve(true);
             }
         });
     });
 }
 
-function removeGameFromUser(uid, gid) {
+async function removeGameFromUser(uid, gid) {
     let sql = "DELETE from user_games where user_id = ? and game_id = ?";
+    let connection = await connector.createConnection(config.db);
     return new Promise(((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((err) => {
-            if (err) {
-                reject(err);
+        connection.query(sql, [uid, gid], (error) => {
+            connection.end();
+            if (error) {
+                reject(error);
             } else {
-                connection.query(sql, [uid, gid], (error) => {
-                    connection.end();
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(true);
-                    }
-                });
+                resolve(true);
             }
-        })
-    }))
+        });
+    }));
 }
 
-function getAllGamesFromUser(uid) {
+async function getAllGamesFromUser(uid) {
     let sql = `SELECT games.game_id, games.name, games.image_link 
                 FROM user_games 
                 INNER JOIN games ON user_games.game_id = games.game_id
                 WHERE user_id = ?`;
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((err) => {
+        connection.query(sql, [uid], (error, data) => {
+            connection.end();
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data.map(dataToGames));
+            }
+        });
+    });
+}
+
+async function addGameToBlackList(userId, gameId) {
+    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
+    let connection = await connector.createConnection(config.db);
+    return new Promise((resolve, reject) => {
+        connection.query(sql, [userId, gameId], (err, result) => {
+            connection.end();
             if (err) {
                 reject(err);
             } else {
-                connection.query(sql, [uid], (error, data) => {
-                    connection.end();
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(data.map(dataToGames));
-                    }
-                });
-            }
-        });
-    });
-
-}
-
-
-function addGameToBlackList(userId, gameId) {
-    let sql = "UPDATE user_games SET blacklist = 1 WHERE user_id = ? AND game_id = ? AND blacklist = 0";
-    return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
-            } else {
-                connection.query(sql, [userId, gameId], (err, result) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (result.affectedRows == 0) {
-                            reject("This game is already on your blacklist!")
-                        }
-                        resolve(true);
-                    }
-                });
+                if (result.affectedRows == 0) {
+                    reject("This game is already on your blacklist!")
+                }
+                resolve(true);
             }
         });
     });
 }
 
 
-function removeGameFromBlackList(userId, gameId) {
+async function removeGameFromBlackList(userId, gameId) {
     let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND game_id = ? AND blacklist = 1";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId, gameId], (err, result) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [userId, gameId], (err, result) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (result.affectedRows == 0) {
-                            reject("This game is not on your blacklist!")
-                        }
-                        resolve(true);
-                    }
-                });
+                if (result.affectedRows == 0) {
+                    reject("This game is not on your blacklist!")
+                }
+                resolve(true);
             }
         });
     });
 }
 
-function resetBlacklist(userId) {
+async function resetBlacklist(userId) {
     let sql = "UPDATE user_games SET blacklist = 0 WHERE user_id = ? AND blacklist = 1";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId], (err, result) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [userId], (err, result) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (result.affectedRows == 0) {
-                            reject("There are no games on your blacklist!");
-                            return;
-                        }
-                        resolve(true);
-                    }
-                });
+                if (result.affectedRows == 0) {
+                    reject("There are no games on your blacklist!");
+                    return;
+                }
+                resolve(true);
             }
         });
     });
 }
 
 
-function checkPendingMatches(userId, suggestedUserId) {
+async function checkPendingMatches(userId, suggestedUserId) {
     let sql = `SELECT accepted FROM pending_matches WHERE first_user = ? AND second_user = ? AND accepted = 1`;
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [suggestedUserId, userId], (err, result) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [suggestedUserId, userId], (err, result) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (result.length > 0) {
-                            resolve(true);
-                            return;
-                        }
-                        resolve(false);
-                    }
-                });
+                if (result.length > 0) {
+                    resolve(true);
+                    return;
+                }
+                resolve(false);
             }
         });
     });
 }
 
-function checkCurrentMatches(userId, suggestedUserId) {
-
+async function checkCurrentMatches(userId, suggestedUserId) {
+    let sql = `SELECT matched_at FROM matches WHERE first_user = ? AND second_user = ? OR first_user = ? AND second_user = ?`;
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let sql = `SELECT matched_at FROM matches WHERE first_user = ? AND second_user = ? OR first_user = ? AND second_user = ?`;
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [suggestedUserId, userId, userId, suggestedUserId], (err, result) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                connection.query(sql, [suggestedUserId, userId, userId, suggestedUserId], (err, result) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (result.length > 0) {
-                            resolve(true);
-                            return;
-                        }
-                        resolve(false);
-                    }
-                })
+                if (result.length > 0) {
+                    resolve(true);
+                    return;
+                }
+                resolve(false);
             }
-        });
+        })
     });
 }
 
 
-function acceptMatchSuggestion(userId, suggestedUserId) {
+async function acceptMatchSuggestion(userId, suggestedUserId) {
     let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 1)";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId, suggestedUserId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+                return;
             } else {
-                connection.query(sql, [userId, suggestedUserId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                        return;
-                    } else {
-                        resolve(true);
-                    }
-                })
+                resolve(true);
             }
         });
     });
 }
 
-function rejectPendingMatch(userId, suggestedUserId) {
+async function rejectPendingMatch(userId, suggestedUserId) {
     let sql = "INSERT INTO pending_matches(first_user, second_user, accepted) VALUES(?, ?, 0)";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-
-        let connection = mysql.createConnection(config.db);
-
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId, suggestedUserId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+                return;
             } else {
-
-                connection.query(sql, [userId, suggestedUserId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                        return;
-                    } else {
-                        resolve(true);
-                    }
-                })
+                resolve(true);
             }
         });
     });
 }
 
 
-function newMatch(userId, suggestedUserId) {
+async function newMatch(userId, suggestedUserId) {
     let sql = `INSERT INTO matches(first_user, second_user) VALUES(?, ?);`;
     return new Promise((resolve, reject) => {
 

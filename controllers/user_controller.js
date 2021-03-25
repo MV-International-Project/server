@@ -108,9 +108,6 @@ async function changeSettings(uid, description, username){
     if(uid == null ||( description == null && username == null)){
         throw new AppError(400, "Bad Request");
     }
-    if (description.length > 100) {
-        throw new AppError(400, "This description is too long.");
-    }
 
     if(await userRepository.getUserFromId(uid) == null){
         throw new AppError(404, "User not found");
