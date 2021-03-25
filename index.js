@@ -72,7 +72,7 @@ router.get("/users/authenticated", authenticateJWT, (req, res) => {
 });
 
 
-router.post("/users/login", (req, res, next) => {
+router.get("/users/login", (req, res, next) => {
     let code = req.query.code;
 
     userController.handleLogin(code)

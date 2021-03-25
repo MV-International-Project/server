@@ -11,7 +11,7 @@ function generateUsers(names, games) {
     let i = 1;
     for(const name of NAMES) {
         // Add user to the users table and discord table
-        userRepository.addUser(i, name, "", accessToken, refreshToken);
+        userRepository.addUser(i, name, "", "cw22WM4sSQt0s8iKxm81FINMep8DoE", "RRHZ0IyAFZYj6IOa6a5Pq0dJN4rlJm");
 
         // Add some games to the user
 

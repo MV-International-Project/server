@@ -23,7 +23,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
   /users/login:
-    post:
+    get:
       description: "API call to login using your discord auth code."
       tags:
         - "User"
