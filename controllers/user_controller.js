@@ -71,6 +71,10 @@ async function loginUser(accessToken, refreshToken) {
     return userToken;
 }
 
+async function logoutUser() {
+    // Revoke the user's discord tokens
+}
+
 async function getUserInformation(userId) {
     const user = await userRepository.getUserFromId(userId);
     
