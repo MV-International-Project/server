@@ -91,7 +91,6 @@ function getMatchSuggestion(userId, whitelist) {
             if(data.length == 0) {
                 resolve(null);
             } else {
-                console.log(data);
                 resolve(data.map(matchSuggestion => matchSuggestion.user_id));
             }
         });

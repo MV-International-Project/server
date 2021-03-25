@@ -14,7 +14,7 @@ async function getMatchSuggestion(uid, whitelist) {
         throw new AppError(404, "No potential matches found.");
     }
 
-    for(let matchSuggestion in potentialMatchIds) {
+    for(const matchSuggestion of potentialMatchIds) {
         const potentialMatch = await userRepository.getUserFromId(matchSuggestion);
         const potentialMatchDiscord = await userController.getDiscordUser(matchSuggestion);
 
