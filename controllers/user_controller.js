@@ -47,6 +47,8 @@ async function registerUser(username, description, accessToken, refreshToken) {
 
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, {algorithm: 'HS256'});
+
+    console.log(`User (${uid}) has been registered.`);
     return userToken;
 }
 
@@ -67,6 +69,7 @@ async function loginUser(accessToken, refreshToken) {
         expiresIn: '3d'
     });
 
+    console.log(`User (${uid}) has logged in.`);
     return userToken;
 }
 
@@ -81,6 +84,7 @@ async function logoutUser(userId, token) {
         // Block the user's JSON token
         await userRepository.addBlockedToken(token);
 
+        console.log(`User (${uid}) has logged out.`);
         return true;
     } catch (err) {
         throw err;
