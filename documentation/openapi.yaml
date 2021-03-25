@@ -22,6 +22,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchedUser"
+    patch:
+      description: "Modify the user's profile."
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                username:
+                  type: string
+      responses:
+        '200':
+          description: "OK, modified user settings"
+        '404':
+          description: "User not found: unable to change settings"
   /users/login:
     get:
       description: "API call to login using your discord auth code."
@@ -221,25 +241,6 @@ paths:
           description: "OK, removed all games from the user's blacklist"
         '404':
           description: "There are nog games on the user's blacklist"
-  /users/description:
-    patch:
-      description: "Modify the user's profile description."
-      tags:
-        - "User"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                description:
-                  type: string
-      responses:
-        '200':
-          description: "OK, modified description"
-        '404':
-          description: "User not found: unable to change description"
   /games/{game_id}:
     get:
       description: "Retrieve a game with a specific ID"

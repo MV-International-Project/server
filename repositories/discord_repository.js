@@ -1,7 +1,9 @@
 "use strict";
 
 const config = require("../config");
+
 const fetch = require('node-fetch');
+
 const ENDPOINT = "https://discord.com/api/v8";
 
 async function getAccessToken(code) {
@@ -86,4 +88,4 @@ module.exports = {
     getAccessToken,
     revokeToken,
     getUser
-}
+};
