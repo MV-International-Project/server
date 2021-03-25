@@ -1,7 +1,7 @@
 const mysql = require("mysql");
-const config = require("../config");
-const {AppError} = require('../errors');
 
+const config = require("../config");
+const connector = require("../connection");
 
 function dataToUser(data) {
     const user = {
@@ -13,14 +13,14 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(userId, username, description, accessToken, refreshToken) {
-    let connection = mysql.createConnection(config.db);
+async function addUser(userId, username, discordName, description, accessToken, refreshToken) {
+    // Add user to the users table
+    let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
         // Transaction to add user and his discord information
         connection.beginTransaction(function (err) {
 
-            // Add user to the users table
-            let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
             connection.query(sql, [userId, username, description], (err) => {
                 if (err) {
                     reject(err);
@@ -43,7 +43,7 @@ function addUser(userId, username, description, accessToken, refreshToken) {
                 }
             });
 
-            // Commit transaction if previous queries were succesful
+            // Commit transaction if previous queries were successful
             connection.commit(err => {
                 if (err) {
                     connection.rollback(() => {
@@ -59,86 +59,65 @@ function addUser(userId, username, description, accessToken, refreshToken) {
     });
 }
 
-function getUserFromId(userId) {
+async function getUserFromId(userId) {
+    let sql = "SELECT * from users where user_id = ?";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [userId], (err, data) => {
+            connection.end();
+            if (err) {
+                reject(err);
             } else {
-                let sql = "SELECT * from users where user_id = ?";
-                connection.query(sql, [userId], (err, data) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        if(data.length == 0) {
-                          resolve(null);
-                          return;
-                        }
-                        resolve(dataToUser(data[0]));
-                    }
-                })
+                if (data.length == 0) {
+                    resolve(null);
+                    return;
+                }
+                resolve(dataToUser(data[0]));
             }
         });
     });
 }
 
-function getTokens(userId) {
+async function getTokens(userId) {
+    let sql = "SELECT access_token, refresh_token from discord where user_id = ?";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
-            }
-            else {
-                let sql = "SELECT access_token, refresh_token from discord where user_id = ?";
-                connection.query(sql, [userId], (err, data) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if(data.length == 0) {
-                            resolve(null);
-                        } else {
-                            resolve({
-                                accessToken: data[0].access_token,
-                                refreshToken: data[0].refresh_token
-                            });
-                        }
-                    }
-                })
+        connection.query(sql, [userId], (err, data) => {
+            connection.end();
+            if (err) {
+                reject(err);
+            } else {
+                if (data.length == 0) {
+                    resolve(null);
+                } else {
+                    resolve({
+                        accessToken: data[0].access_token,
+                        refreshToken: data[0].refresh_token
+                    });
+                }
             }
         });
     });
 }
 
-function changeSettings(uid, description, username) {
+async function changeSettings(uid, description, username) {
+    let sql = "UPDATE users SET description = ?, username = ? where user_id = ?";
+    let connection = await connector.createConnection();
     return new Promise(((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
+        connection.query(sql, [description, username, uid], (err) => {
+            if (err) {
+                reject(err);
             } else {
-                let sql = "UPDATE users SET description = ?, username = ? where user_id = ?";
-                connection.query(sql, [description, username, uid], (err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                })
+                resolve();
             }
-        })
-    }))
+        });
+    }));
 }
 
-function addBlockedToken(token) {
+async function addBlockedToken(token) {
+    let sql = "INSERT into blocked_tokens(token) VALUES(?)";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-
-        let sql = "INSERT into blocked_tokens(token) VALUES(?)";
         connection.query(sql, [token], (err) => {
             connection.end();
             if (err) {
@@ -151,11 +130,10 @@ function addBlockedToken(token) {
     });
 }
 
-function isTokenBlocked(token) {
+async function isTokenBlocked(token) {
+    let sql = "SELECT token FROM blocked_tokens WHERE token = ? AND CURRENT_TIMESTAMP() < expiry";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-
-        let sql = "SELECT token FROM blocked_tokens WHERE token = ? AND CURRENT_TIMESTAMP() < expiry";
         connection.query(sql, [token], (err, data) => {
             connection.end();
             if (err) {
@@ -168,52 +146,40 @@ function isTokenBlocked(token) {
     });
 }
 
-function updateDiscordTokens(userId, accessToken, refreshToken) {
-    return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
-            } else {
-                let sql = `UPDATE discord 
+async function updateDiscordTokens(userId, accessToken, refreshToken) {
+    let sql = `UPDATE discord 
                     SET access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-                connection.query(sql, [accessToken, refreshToken, userId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(true);
-                    }
-                });
+    let connection = await connector.createConnection(config.db);
+    return new Promise((resolve, reject) => {
+        connection.query(sql, [accessToken, refreshToken, userId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+            } else {
+                resolve(true);
             }
         });
     });
 }
 
-function revokeDiscordTokens(userId) {
-    return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((error) => {
-            if (error) {
-                reject(error);
-            } else {
-                let sql = `UPDATE discord 
+async function revokeDiscordTokens(userId) {
+    let sql = `UPDATE discord 
                     SET access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-                connection.query(sql, ['', '', userId], (err) => {
-                    connection.end();
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(true);
-                    }
-                });
+    let connection = await connector.createConnection(config.db);
+    return new Promise((resolve, reject) => {
+        connection.query(sql, ['', '', userId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+            } else {
+                resolve(true);
             }
         });
-    });    
+    });
 }
 
 module.exports = {

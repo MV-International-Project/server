@@ -1,26 +1,28 @@
+"use strict";
+
 const mysql = require("mysql");
+
 const config = require("../config");
-const { AppError } = require('../errors');
+const connector = require("../connection");
 
 function dataToMatch(data) {
     const match = {
-      first_user: data.first_user,
-      second_user: data.second_user,
-      matched_at: data.matched_at
+        first_user: data.first_user,
+        second_user: data.second_user,
+        matched_at: data.matched_at
     };
     return match
 }
 
 function matchDataToUser(data) {
     let match;
-    if(data.first_user != null){
-         match = {
+    if (data.first_user != null) {
+        match = {
             user: data.first_user,
             matched_at: data.matched_at
         };
-    }
-    else {
-         match = {
+    } else {
+        match = {
             user: data.second_user,
             matched_at: data.matched_at
         };
@@ -28,32 +30,24 @@ function matchDataToUser(data) {
     return match;
 }
 
-function getMatch(firstUid, secondUid) {
+async function getMatch(firstUid, secondUid) {
+    let sql = "SELECT * from matches where first_user = ? and second_user = ?";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((err) => {
-            if(err){
-                reject(err);
+        connection.query(sql, [firstUid, secondUid], (error, data) => {
+            connection.end();
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data.map(dataToMatch));
             }
-            else {
-                let sql = "SELECT * from matches where first_user = ? and second_user = ?";
-                connection.query(sql, [firstUid, secondUid], (error, data) => {
-                    connection.end();
-                    if(error){
-                        reject(error);
-                    }
-                    else {
-                        resolve(data.map(dataToMatch));
-                    }
-                })
-            }
-        })
+        });
     });
 }
 
-function getMatchSuggestion(userId, whitelist) {
+async function getMatchSuggestion(userId, whitelist) {
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-    let connection = mysql.createConnection(config.db);
         /*
             This function will look for people that have the most games in common with you,
             if you already swiped someone or matches someone they will not be suggested to
@@ -73,12 +67,12 @@ function getMatchSuggestion(userId, whitelist) {
     ORDER BY commongames DESC
     LIMIT 2;`;
         connection.query(sql, Array(5).fill(userId), (error, data) => {
-            if(error) {
+            if (error) {
                 reject(error);
                 return;
             }
 
-            if(data.length == 0) {
+            if (data.length == 0) {
                 resolve(null);
             } else {
                 resolve(data.map(matchSuggestion => matchSuggestion.user_id));
@@ -87,28 +81,20 @@ function getMatchSuggestion(userId, whitelist) {
     });
 }
 
-function getAllMatches(uid){
+async function getAllMatches(uid) {
+    let sql = "SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
+        " first_user, matched_at FROM matches WHERE second_user = ?";
+    let connection = await connector.createConnection(config.db);
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
-        connection.connect((err) => {
-            if(err){
-                reject(err);
-            }
-            else {
-                let sql = "SELECT second_user, matched_at FROM matches WHERE first_user = ? UNION SELECT" +
-                    " first_user, matched_at FROM matches WHERE second_user = ?";
-                connection.query(sql, [uid, uid], (error, data) => {
-                    connection.end();
-                    if(error){
-                        reject(error);
-                    }
-                    else {
-                        resolve(data.map(matchDataToUser));
-                    }
-                })
+        connection.query(sql, [uid, uid], (error, data) => {
+            connection.end();
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data.map(matchDataToUser));
             }
         });
-    });    
+    });
 }
 
 module.exports = {
