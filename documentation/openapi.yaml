@@ -281,5 +281,3 @@ components:
               type: integer
             rank:
               type: string
-            blacklist:
-              type: boolean

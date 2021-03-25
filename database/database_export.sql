@@ -77,7 +77,6 @@ CREATE TABLE `user_games` (
   `game_id` int NOT NULL,
   `hours_played` int DEFAULT NULL,
   `rank` varchar(20) DEFAULT NULL,
-  `blacklist` bit(1) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`game_id`),
   KEY `fk_games_userGamer` (`game_id`),
   CONSTRAINT `fk_games_userGamer` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`),
