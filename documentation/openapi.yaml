@@ -27,15 +27,12 @@ paths:
       description: "API call to login using your discord auth code."
       tags:
         - "User"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: "OK, logged in user."
@@ -53,6 +50,18 @@ paths:
           description: "Log out from your account."
         '400':
           description: "There is no logged-in user."
+  /users/authenticated:
+    get:
+      description: "Check if you are currently logged in."
+      tags:
+        - "User"
+      responses:
+        '200':
+          description: "Boolean to show that the user is logged in or not"
+          content:
+            application/json:
+              schema:
+                type: boolean
   /users/matchSuggestion:
     get:
       description: "Retrieve a possible match to swipe."
@@ -66,21 +75,24 @@ paths:
             type: array
             items:
               type: integer
+            description: "Games that are on your whitelist."
       responses:
         '200':
           description: "Retrieved user info."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-  /users/matchSuggestion/{user_id}:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /users/matchSuggestion/{suggested_user_id}:
     patch:
       description: "API call to indicate whether you accept or reject a user."
       tags:
         - "User"
       parameters:
         - in: path
-          name: id
+          name: suggested_user_id
           required: true
           schema:
             $ref: "#/components/schemas/user_id"
@@ -107,14 +119,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    $ref: "#/components/schemas/user_id"
-                  username:
-                    $ref: "#/components/schemas/username"
-                  avatar_path:
-                    type: string
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchedUser"
   /users/matches/{user_id}:
     get:
       description: "Retrieve all information about one of your matches."
@@ -290,7 +297,7 @@ components:
           properties:
             discord_tag:
               type: string
-            steam_name:
+            matched_at:
               type: string
     Game:
       type: object
