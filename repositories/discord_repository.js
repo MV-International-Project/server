@@ -50,6 +50,23 @@ function refreshAccessToken() {
     .catch(err => reject(err));
 }
 
+function revokeToken(token, type) {
+    return new Promise((resolve, reject) => {
+        fetch(`${ENDPOINT}/oauth2/token/revoke`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&\
+        token=${token}&token_type_hint=${type}`})
+        .then(res => {
+            resolve();
+        }).catch(err => {
+            reject(err);
+        });
+    });   
+}
+
 function getUser(accessToken) {
     return new Promise((resolve, reject) => {
         fetchWithAccessToken(`${ENDPOINT}/users/@me`, 
@@ -67,5 +84,6 @@ function getUser(accessToken) {
 
 module.exports = {
     getAccessToken,
+    revokeToken,
     getUser
 }
