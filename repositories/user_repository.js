@@ -113,15 +113,15 @@ function getTokens(userId) {
     });
 }
 
-function changeDescription(uid, description) {
-    let sql = "UPDATE users SET description = ? where user_id = ?";
+function changeSettings(uid, description, username) {
     return new Promise(((resolve, reject) => {
+        let sql = "UPDATE users SET description = ? where user_id = ?";
         let connection = mysql.createConnection(config.db);
         connection.connect((error) => {
             if (error) {
                 reject(error);
             } else {
-                connection.query(sql, [description, uid], (err) => {
+                connection.query(sql, [description, username, uid], (err) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -129,7 +129,7 @@ function changeDescription(uid, description) {
                     }
                 });
             }
-        })
+        });
     }))
 }
 
@@ -218,7 +218,7 @@ function revokeDiscordTokens(userId) {
 module.exports = {
     addUser,
     getUserFromId,
-    changeDescription,
+    changeSettings,
     addBlockedToken,
     isTokenBlocked,
     getTokens,
