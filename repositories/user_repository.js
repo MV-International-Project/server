@@ -13,7 +13,7 @@ function dataToUser(data) {
     return user;
 }
 
-function addUser(userId, username, discordName, description, accessToken, refreshToken) {
+function addUser(userId, username, description, accessToken, refreshToken) {
     let connection = mysql.createConnection(config.db);
     return new Promise((resolve, reject) => {
         // Transaction to add user and his discord information
@@ -32,9 +32,9 @@ function addUser(userId, username, discordName, description, accessToken, refres
             });
 
             // Add the users discord information
-            sql = `INSERT INTO discord(user_id, discord_id, access_token, refresh_token)
-            VALUES(?, ?, ?, ?);`;
-            connection.query(sql, [userId, discordName, accessToken, refreshToken], (err) => {
+            sql = `INSERT INTO discord(user_id, access_token, refresh_token)
+            VALUES(?, ?, ?);`;
+            connection.query(sql, [userId, accessToken, refreshToken], (err) => {
                 connection.end();
                 if (err) {
                     reject(err);
