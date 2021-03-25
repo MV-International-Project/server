@@ -80,7 +80,7 @@ router.get("/users/login", (req, res, next) => {
     userController.handleLogin(code)
         .then(result => {
             res.status(200)
-            .cookie("authToken", result, {httpOnly: true, maxAge: 604800000})
+            .cookie("authToken", result, {httpOnly: false, maxAge: 604800000})
             .redirect(config.clientPath);
         }).catch(next);
 });
