@@ -74,6 +74,8 @@ function getMatchSuggestion(userId, whitelist) {
     ORDER BY commongames DESC
     LIMIT 2;`;
         connection.query(sql, Array(5).fill(userId), (error, data) => {
+            connection.end();
+            
             if(error) {
                 reject(error);
                 return;
