@@ -176,7 +176,7 @@ function updateDiscordTokens(userId, accessToken, refreshToken) {
                 reject(error);
             } else {
                 let sql = `UPDATE discord 
-                    access_token = ?, 
+                    SET access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
                 connection.query(sql, [accessToken, refreshToken, userId], (err) => {

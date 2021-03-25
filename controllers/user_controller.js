@@ -66,7 +66,8 @@ async function loginUser(accessToken, refreshToken) {
     await userRepository.updateDiscordTokens(uid, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
-    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256'});
+    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, { algorithm: 'HS256',
+    expiresIn: '3d'});
 
     return userToken;
 }
@@ -99,7 +100,7 @@ async function getUserInformation(userId) {
         throw new AppError(404, "Authenticated user not found.");
     }
 
-    return mapUserObject(user, getDiscordUser(userId));
+    return mapUserObject(user, await getDiscordUser(userId));
 }
 
 async function changeDescription(uid, description){
