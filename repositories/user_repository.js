@@ -33,7 +33,7 @@ function addUser(userId, username, description, accessToken, refreshToken) {
 
             // Add the users discord information
             sql = `INSERT INTO discord(user_id, access_token, refresh_token)
-            VALUES(?, ?, ?, ?);`;
+            VALUES(?, ?, ?);`;
             connection.query(sql, [userId, accessToken, refreshToken], (err) => {
                 connection.end();
                 if (err) {
