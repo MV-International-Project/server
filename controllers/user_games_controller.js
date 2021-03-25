@@ -87,18 +87,6 @@ async function respondToMatchSuggestion(userId, suggestedUserId, accepted) {
     return true;
 }
 
-async function resetBlacklist(userId) {
-    if (userId == null) {
-        throw new AppError(400, "Bad request");
-    }
-
-    if (await userRepository.getUserFromId(userId) == null) {
-        throw new AppError(404, "User not found.");
-    }
-    // Reset blacklist
-    await userGamesRepository.resetBlacklist(userId);
-    return true;
-}
 
 async function hasGame(uid, gid) {
     let userGames = await userGamesRepository.getAllGamesFromUser(uid);
