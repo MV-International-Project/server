@@ -200,16 +200,6 @@ paths:
       responses:
         '200':
           description: "OK, deleted game from the user's games."
-  /users/blacklist:
-    delete:
-      description: "Remove all the games from the user's blacklist."
-      tags:
-        - "User"
-      responses:
-        '200':
-          description: "OK, removed all games from the user's blacklist"
-        '404':
-          description: "There are nog games on the user's blacklist"
   /games/{game_id}:
     get:
       description: "Retrieve a game with a specific ID"
