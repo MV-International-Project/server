@@ -80,18 +80,18 @@ router.get("/users/login", (req, res, next) => {
     userController.handleLogin(code)
         .then(result => {
             res.status(200)
-            .cookie("authToken", result, {httpOnly: false, maxAge: 604800000})
-            .redirect(config.clientPath);
+                .cookie("authToken", result, {httpOnly: false, maxAge: 604800000})
+                .redirect(config.clientPath);
         }).catch(next);
 });
 
 router.post("/users/logout", authenticateJWT, (req, res, next) => {
     userController.logoutUser(req.user_id, req.token)
-    .then(result => {
-        res.status(200)
-        .clearCookie("authToken")
-        .json(result);
-    }).catch(next);
+        .then(result => {
+            res.status(200)
+                .clearCookie("authToken")
+                .json(result);
+        }).catch(next);
 });
 
 router.delete("/users/games/:game_id", authenticateJWT, (req, res, next) => {
@@ -124,7 +124,7 @@ router.patch("/user", authenticateJWT, (req, res, next) => {
 });
 
 
-router.get("/users/matches", authenticateJWT, (req,res, next) => {
+router.get("/users/matches", authenticateJWT, (req, res, next) => {
     let userId = req.user_id;
     matchController.getAllMatches(userId)
         .then(result => res.status(200).json(result))
@@ -134,15 +134,15 @@ router.get("/users/matches", authenticateJWT, (req,res, next) => {
 router.get("/games/:game_id", (req, res, next) => {
     let gameId = req.params.game_id;
     gameController.getGameById(gameId).then(result => res.status(200).json(result))
-    .catch(next);
+        .catch(next);
 });
 
 router.get("/users/matchSuggestion", authenticateJWT, (req, res, next) => {
     const whitelist = req.query.games;
 
     matchController.getMatchSuggestion(req.user_id, whitelist)
-    .then(potentialMatch => res.status(200).json(potentialMatch))
-    .catch(next);
+        .then(potentialMatch => res.status(200).json(potentialMatch))
+        .catch(next);
 });
 
 router.patch("/users/matchSuggestion/:suggested_user_id", authenticateJWT, (req, res, next) => {
@@ -157,7 +157,7 @@ router.patch("/users/matchSuggestion/:suggested_user_id", authenticateJWT, (req,
 
 });
 
-router.get("/users/matches/:user_id", authenticateJWT , (req, res , next) => {
+router.get("/users/matches/:user_id", authenticateJWT, (req, res, next) => {
     let currentUserId = req.user_id;
     let matchedUserId = req.params.user_id;
     matchController.getInfoOfMatchedUser(currentUserId, matchedUserId)
@@ -173,7 +173,7 @@ router.post("/test", (req, res) => {
 app.use(errorHandler);
 
 const server = http.createServer(app);
-const port = config.port;
+const port = process.env.PORT || config.port;
 server.listen(port);
 
 console.log(colors.brightBlue(`International Project 06 back-end up and running at port ${port}`));
