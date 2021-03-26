@@ -124,10 +124,10 @@ async function changeSettings(uid, description, username){
 
     const user = await userRepository.getUserFromId(uid);
 
-    if(description == null){
+    if(description === ""){
         description = user.description;
     }
-    if(username == null){
+    if(username === ""){
         username = user.username
     }
     if(description.length > 100){
