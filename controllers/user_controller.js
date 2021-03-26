@@ -60,6 +60,11 @@ async function loginUser(accessToken, refreshToken) {
     let user = await discordRepository.getUser(accessToken);
     let uid = user.id;
 
+    // Refresh the user's discord access token (so we get a new full expiry time)
+    let newToken = await discordRepository.refreshAccessToken(refreshToken);
+    accessToken = newToken.access_token;
+    refreshToken = newToken.refresh_token;
+
     // Login user and update his access / refresh tokens
     await userRepository.updateDiscordTokens(uid, accessToken, refreshToken);
 
