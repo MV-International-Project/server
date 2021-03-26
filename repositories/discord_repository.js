@@ -12,7 +12,7 @@ async function getAccessToken(code) {
             "Content-Type": "application/x-www-form-urlencoded"
         },
         body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=authorization_code&code=${code}\&
-        scope=identify%20connections%20gdm.join&redirect_uri=http://127.0.0.1:8888/api/users/login`})
+        scope=identify%20connections%20gdm.join&redirect_uri=${config.redirectUri}`})
         .then(res => res.json())
         .then(token => {
             resolve(token);

@@ -25,5 +25,6 @@ config.discord = {
     client_id: "823503484522463263",
     client_secret: "is170xkhKhm_4Z_CnNJQlWsdXhPBviSe"
 }
+config.redirectUri = "https://ip-binder.herokuapp.com/api/users/login";
 
 module.exports = config;
