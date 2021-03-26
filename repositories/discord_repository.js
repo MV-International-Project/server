@@ -1,5 +1,3 @@
-const config = require("../config");
-
 const fetch = require('node-fetch');
 
 const ENDPOINT = "https://discord.com/api/v8";
@@ -11,8 +9,8 @@ async function getAccessToken(code) {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=authorization_code&code=${code}\&
-        scope=identify%20connections%20gdm.join&redirect_uri=${config.redirectUri}`})
+        body: `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}\&
+        scope=identify%20connections%20gdm.join&redirect_uri=${process.env.REDIRECT_URI}`})
         .then(res => res.json())
         .then(token => {
             resolve(token);
@@ -40,7 +38,7 @@ function refreshAccessToken(refreshToken) {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=refresh_token&refresh_token=${refreshToken}\&
+            body: `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${refreshToken}\&
             scope=identify%20connections%20gdm.join`
         })
         .then(res => res.json())
@@ -59,7 +57,7 @@ function revokeToken(token, type) {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&\
+        body: `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&\
         token=${token}&token_type_hint=${type}`})
         .then(res => {
             resolve(true);

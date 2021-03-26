@@ -1,14 +1,14 @@
 const mysql = require("mysql");
-const config = require("../config");
+
 const { AppError } = require('../errors');
+const connector = require("../connection");
 
 function dataToMatch(data) {
-    const match = {
-      first_user: data.first_user,
-      second_user: data.second_user,
-      matched_at: data.matched_at
-    };
-    return match
+    return {
+        first_user: data.first_user,
+        second_user: data.second_user,
+        matched_at: data.matched_at
+    }
 }
 
 function matchDataToUser(data) {
@@ -31,7 +31,7 @@ function matchDataToUser(data) {
 
 function getMatch(firstUid, secondUid) {
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
+        let connection = mysql.createConnection(connector.getDB());
         connection.connect((err) => {
             if(err){
                 reject(err);
@@ -54,7 +54,7 @@ function getMatch(firstUid, secondUid) {
 
 function getMatchSuggestion(userId, whitelist) {
     return new Promise((resolve, reject) => {
-    let connection = mysql.createConnection(config.db);
+    let connection = mysql.createConnection(connector.getDB());
         /*
             This function will look for people that have the most games in common with you,
             if you already swiped someone or matches someone they will not be suggested to
@@ -81,7 +81,7 @@ function getMatchSuggestion(userId, whitelist) {
                 return;
             }
 
-            if(data.length == 0) {
+            if(data.length === 0) {
                 resolve(null);
             } else {
                 resolve(data.map(matchSuggestion => matchSuggestion.user_id));
@@ -92,7 +92,7 @@ function getMatchSuggestion(userId, whitelist) {
 
 function getAllMatches(uid){
     return new Promise((resolve, reject) => {
-        let connection = mysql.createConnection(config.db);
+        let connection = mysql.createConnection(connector.getDB());
         connection.connect((err) => {
             if(err){
                 reject(err);

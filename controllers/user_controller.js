@@ -1,4 +1,3 @@
-const config = require('../config');
 const {AppError} = require('../errors');
 
 const discordRepository = require("../repositories/discord_repository");
@@ -46,7 +45,7 @@ async function registerUser(username, description, accessToken, refreshToken) {
     await userRepository.addUser(uid, username, description, accessToken, refreshToken);
 
     // Get a JSON web token and return it to the user
-    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, {algorithm: 'HS256'});
+    let userToken = jwt.sign({id: uid}, process.env.JSON_WEBTOKEN, {algorithm: 'HS256'});
 
     console.log(`User ${uid} has been registered.`);
     return userToken;
@@ -73,7 +72,7 @@ async function loginUser(accessToken, refreshToken) {
 
 
     // Get a JSON web token and return it to the user
-    let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, {
+    let userToken = jwt.sign({id: uid}, process.env.JSON_WEBTOKEN, {
         algorithm: 'HS256',
         expiresIn: '3d'
     });
