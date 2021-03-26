@@ -63,6 +63,10 @@ async function loginUser(accessToken, refreshToken) {
     // Login user and update his access / refresh tokens
     await userRepository.updateDiscordTokens(uid, accessToken, refreshToken);
 
+    // Update user login status
+    await userRepository.updateUserLogin(uid);
+
+
     // Get a JSON web token and return it to the user
     let userToken = jwt.sign({id: uid}, config.jsonwebtoken.key, {
         algorithm: 'HS256',

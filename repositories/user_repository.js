@@ -164,6 +164,21 @@ async function updateDiscordTokens(userId, accessToken, refreshToken) {
     });
 }
 
+async function updateUserLogin(userId) {
+    let sql = `UPDATE users SET last_login=now() WHERE user_id = ?`;
+    let connection = await connector.createConnection(config.db);
+    return new Promise((resolve, reject) => {
+        connection.query(sql, [userId], (err) => {
+            connection.end();
+            if (err) {
+                reject(err);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
 async function revokeDiscordTokens(userId) {
     let sql = `UPDATE discord 
                     SET access_token = ?, 
@@ -190,5 +205,6 @@ module.exports = {
     isTokenBlocked,
     getTokens,
     revokeDiscordTokens,
-    updateDiscordTokens
+    updateDiscordTokens,
+    updateUserLogin
 };
