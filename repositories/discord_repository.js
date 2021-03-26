@@ -4,6 +4,8 @@ const ENDPOINT = "https://discord.com/api/v8";
 
 async function getAccessToken(code) {
     return new Promise((resolve, reject) => {
+        console.log(`client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}\&
+        scope=identify%20connections%20gdm.join&redirect_uri=${process.env.REDIRECT_URI}`)
         fetch(`${ENDPOINT}/oauth2/token`, {
         method: "POST",
         headers: {

@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 async function handleLogin(code) {
     const tokens = await discordRepository.getAccessToken(code);
+    console.log(tokens);
     const accessToken = tokens.access_token;
     const refreshToken = tokens.refresh_token;
 
