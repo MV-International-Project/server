@@ -32,22 +32,24 @@ function fetchWithAccessToken(url, token, options = {}) {
     return fetch(url, optionsWithToken);
 }
 
-function refreshAccessToken() {
-    const refreshToken = "xHVikocIYsu8ZotjOLOrCTT0vhrSba";
-    fetch(`${ENDPOINT}/oauth2/token`, 
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=refresh_token&refresh_token=${refreshToken}\&
-        scope=identify%20connections%20gdm.join`
-    })
-    .then(res => res.json())
-    .then(newToken => {
-        return resolve(true);
-    })
-    .catch(err => reject(err));
+function refreshAccessToken(refreshToken) {
+    return new Promise((resolve, reject) => {
+        fetch(`${ENDPOINT}/oauth2/token`, 
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&grant_type=refresh_token&refresh_token=${refreshToken}\&
+            scope=identify%20connections%20gdm.join`
+        })
+        .then(res => res.json())
+        .then(newToken => {
+            resolve(newToken);
+            return;
+        })
+        .catch(err => reject(err));
+    });
 }
 
 function revokeToken(token, type) {
@@ -60,7 +62,7 @@ function revokeToken(token, type) {
         body: `client_id=${config.discord.client_id}&client_secret=${config.discord.client_secret}&\
         token=${token}&token_type_hint=${type}`})
         .then(res => {
-            resolve();
+            resolve(true);
         }).catch(err => {
             reject(err);
         });
@@ -84,6 +86,7 @@ function getUser(accessToken) {
 
 module.exports = {
     getAccessToken,
+    refreshAccessToken,
     revokeToken,
     getUser
 };
