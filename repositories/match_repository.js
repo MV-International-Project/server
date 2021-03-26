@@ -65,6 +65,7 @@ function getMatchSuggestion(userId, whitelist) {
         let sql = `SELECT users.user_id, COUNT(*) AS commongames FROM users
     INNER JOIN user_games ON users.user_id = user_games.user_id
     WHERE users.user_id != ?
+    AND users.last_login >= DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 WEEK)
     AND NOT EXISTS(SELECT * FROM matches WHERE (first_user = ? AND second_user = users.user_id)
             OR (first_user = users.user_id AND second_user = ?))
     AND NOT EXISTS (SELECT * FROM pending_matches WHERE first_user = ? AND second_user = users.user_id)
