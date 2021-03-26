@@ -1,6 +1,7 @@
 "use strict";
 
-const config = require('./config');
+require('dotenv').config(); // add the env vars
+
 const cors = require('cors');
 
 const {AppError} = require('./errors');
@@ -43,7 +44,7 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1]; // Bearer TOKEN
 
-        jwt.verify(token, config.jsonwebtoken.key, async (err, payload) => {
+        jwt.verify(token, process.env.JSON_WEBTOKEN, async (err, payload) => {
             if (err || await userController.isTokenBlocked(token)) {
                 return res.sendStatus(403);
             }
@@ -81,7 +82,7 @@ router.get("/users/login", (req, res, next) => {
         .then(result => {
             res.status(200)
                 .cookie("authToken", result, {httpOnly: false, maxAge: 604800000})
-                .redirect(config.clientPath);
+                .redirect(process.env.CLIENT_PATH);
         }).catch(next);
 });
 
@@ -173,7 +174,7 @@ router.post("/test", (req, res) => {
 app.use(errorHandler);
 
 const server = http.createServer(app);
-const port = process.env.PORT || config.port;
+const port = process.env.PORT || process.env.LOCAL_PORT; // .PORT  is used by heroku
 server.listen(port);
 
 console.log(colors.brightBlue(`International Project 06 back-end up and running at port ${port}`));

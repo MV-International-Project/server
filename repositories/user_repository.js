@@ -1,6 +1,5 @@
 const mysql = require("mysql");
 
-const config = require("../config");
 const connector = require("../connection");
 
 function dataToUser(data) {
@@ -16,7 +15,7 @@ function dataToUser(data) {
 async function addUser(userId, username, description, accessToken, refreshToken) {
     // Add user to the users table
     let sql = "INSERT into users(user_id ,username, description) VALUES(?,?,?)";
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         // Transaction to add user and his discord information
         connection.beginTransaction(function (err) {
@@ -61,7 +60,7 @@ async function addUser(userId, username, description, accessToken, refreshToken)
 
 async function getUserFromId(userId) {
     let sql = "SELECT * from users where user_id = ?";
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [userId], (err, data) => {
             connection.end();
@@ -80,7 +79,7 @@ async function getUserFromId(userId) {
 
 async function getTokens(userId) {
     let sql = "SELECT access_token, refresh_token from discord where user_id = ?";
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [userId], (err, data) => {
             connection.end();
@@ -116,13 +115,12 @@ async function changeSettings(uid, description, username) {
 
 async function addBlockedToken(token) {
     let sql = "INSERT into blocked_tokens(token) VALUES(?)";
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [token], (err) => {
             connection.end();
             if (err) {
                 reject(err);
-                return;
             } else {
                 resolve(true);
             }
@@ -132,13 +130,12 @@ async function addBlockedToken(token) {
 
 async function isTokenBlocked(token) {
     let sql = "SELECT token FROM blocked_tokens WHERE token = ? AND CURRENT_TIMESTAMP() < expiry";
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [token], (err, data) => {
             connection.end();
             if (err) {
                 reject(err);
-                return;
             } else {
                 resolve(data.length > 0);
             }
@@ -151,7 +148,7 @@ async function updateDiscordTokens(userId, accessToken, refreshToken) {
                     SET access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [accessToken, refreshToken, userId], (err) => {
             connection.end();
@@ -166,7 +163,7 @@ async function updateDiscordTokens(userId, accessToken, refreshToken) {
 
 async function updateUserLogin(userId) {
     let sql = `UPDATE users SET last_login=now() WHERE user_id = ?`;
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, [userId], (err) => {
             connection.end();
@@ -184,7 +181,7 @@ async function revokeDiscordTokens(userId) {
                     SET access_token = ?, 
                     refresh_token = ?
                     WHERE user_id = ?`;
-    let connection = await connector.createConnection(config.db);
+    let connection = await connector.createConnection(connector.getDB());
     return new Promise((resolve, reject) => {
         connection.query(sql, ['', '', userId], (err) => {
             connection.end();
